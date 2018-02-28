@@ -1,7 +1,8 @@
 import discord
+import os
 from discord.ext import commands
 
-#token = ''
+token = os.getenv('token')
 
 bot = commands.Bot(description="Below is a listing for Bjarne's commands. Use '!' infront of any of them to execute a command, like '!help'", command_prefix="!")
 
