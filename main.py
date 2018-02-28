@@ -15,20 +15,27 @@ async def on_ready():
 
 @bot.event
 async def on_member_join(member):
+    # get channel IDs
+    lobbyChannel = bot.get_channel('400443010153709569')
+    rulesChannel = bot.get_channel('400075802018054146')
+    announcementChannel = bot.get_channel('418194492059811842')
+    introductionChannel = bot.get_channel('418556010114842635')
+
     # Announce a new member joining in the lobby channel.
-    welcomeMesssage = member.mention + ' has joined the server. Welcome!'
-    channel = bot.get_channel('400075802018054146')
-    await bot.send_message(channel, welcomeMesssage)
+    welcomeMesssage = 'Welcome ' + member.mention 
+    welcomeMessage += ' to the UWS Game Dev Society!'
+    welcomeMessage += ' Please check out ' + rulesChannel
+    welcomeMessage += ' and set your server nickname to your real name.'
+    welcomeMessage += ' Visit ' + announcementChannel
+    welcomeMessage += ' to see what events are coming up!'
+    welcomeMessage += 'Why not ' + introductionChannel
+    welcomeMessage += '? Please conduct yourself professionally in public-facing channels like' + lobbyChannel
+    welcomeMessage += '. Thanks!'
+    await bot.send_message(lobbyChannel, welcomeMesssage)
 
-    # Send a private message to the new member with server info
-    rulesChannel = bot.get_channel('400443010153709569')
-    introductionChannel = bot.get_channel('418194492059811842')
-    msg = 'Welcome to the UWS Game Dev Society Discord! You can find our rules in ' + rulesChannel.mention
-    msg += '. Please set your server nickname to your real name for networking purposes. '
-    msg += 'Let us know who you are in ' + introductionChannel.mention + " . "
-    msg += "Type '!help' for a list of my commands."
-    await bot.send_message(member, msg)
-
+    # Send above message to new member in a private messag
+    welcomeMessage += "Type '!help' for a list of my commands."
+    await bot.send_message(member, welcomeMessage)
 
 @bot.command()
 async def say(*, something):
@@ -38,7 +45,7 @@ async def say(*, something):
 @bot.command()
 async def version():
     """Display Bjarne version info."""
-    await bot.say('alphaaa')
+    await bot.say('super early, dont expect much yet, details on contributing to Bjarne will come soon')
     
 
 """
