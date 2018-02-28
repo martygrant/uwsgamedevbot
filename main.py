@@ -24,11 +24,11 @@ async def on_member_join(member):
     # Announce a new member joining in the lobby channel.
     welcomeMessage = 'Welcome ' + member.mention 
     welcomeMessage += ' to the UWS Game Dev Society!'
-    welcomeMessage += ' Please check out ' + rulesChannel
+    welcomeMessage += ' Please check out ' + rulesChannel.mention
     welcomeMessage += ' and set your server nickname to your real name.'
-    welcomeMessage += ' Visit ' + announcementChannel
+    welcomeMessage += ' Visit ' + announcementChannel.mention
     welcomeMessage += ' to see what events are coming up!'
-    welcomeMessage += 'Why not ' + introductionChannel
+    welcomeMessage += 'Why not ' + introductionChannel.mention
     welcomeMessage += '? Please conduct yourself professionally in public-facing channels like' + lobbyChannel
     welcomeMessage += '. Thanks!'
     await bot.send_message(lobbyChannel, welcomeMesssage)
