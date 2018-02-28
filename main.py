@@ -29,7 +29,7 @@ async def on_member_join(member):
     welcomeMessage += ' Visit ' + announcementChannel.mention
     welcomeMessage += ' to see what events are coming up!'
     welcomeMessage += 'Why not ' + introductionChannel.mention
-    welcomeMessage += '? Please conduct yourself professionally in public-facing channels like' + lobbyChannel
+    welcomeMessage += '? Please conduct yourself professionally in public-facing channels like' + lobbyChannel.mention
     welcomeMessage += '. Thanks!'
     await bot.send_message(lobbyChannel, welcomeMesssage)
 
