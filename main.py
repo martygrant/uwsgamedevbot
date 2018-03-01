@@ -31,7 +31,7 @@ async def on_member_join(member):
     welcomeMessage += 'Why not ' + introductionChannel.mention
     welcomeMessage += '? Please conduct yourself professionally in public-facing channels like' + lobbyChannel.mention
     welcomeMessage += '. Thanks!'
-    await bot.send_message(lobbyChannel, welcomeMesssage)
+    await bot.send_message(lobbyChannel, welcomeMessage)
 
     # Send above message to new member in a private messag
     welcomeMessage += "Type '!help' for a list of my commands."
