@@ -16,10 +16,10 @@ async def on_ready():
 @bot.event
 async def on_member_join(member):
     # get channel IDs
-    lobbyChannel = bot.get_channel('400443010153709569')
-    rulesChannel = bot.get_channel('400075802018054146')
-    announcementChannel = bot.get_channel('418194492059811842')
-    introductionChannel = bot.get_channel('418556010114842635')
+    lobbyChannel = bot.get_channel('412327350366240768')
+    rulesChannel = bot.get_channel('405741154643214356')
+    announcementChannel = bot.get_channel('405451914973806602')
+    introductionChannel = bot.get_channel('413835267557031937')
 
     # Announce a new member joining in the lobby channel.
     welcomeMessage = 'Welcome ' + member.mention 
