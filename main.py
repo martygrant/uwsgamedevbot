@@ -1,6 +1,19 @@
+##### Discord bot for the UWS Game Dev Society, originally developed by Martin Grant
+##### Created 28/02/2018 
+##### Last Update 2/03/2018
+##### Version 0.1
+##### Contributors
+#
+#
+#
+#####
+
 import discord
 import os
+import random
 from discord.ext import commands
+
+version = os.getenv('version')
 
 token = os.getenv('token')
 
@@ -45,8 +58,23 @@ async def say(*, something):
 @bot.command()
 async def version():
     """Display Bjarne version info."""
+    versionMessage = 'v' + version
+    versionMessage += " - https://github.com/martygrant/uwsgamedevbot"
     await bot.say('super early, dont expect much yet, details on contributing to Bjarne will come soon')
-    
+
+@bot.command()
+async def bjarnequote():
+    """A quote from Bjarne Stroustrup, creator of C++."""
+    quoteList = [
+        'A program that has not been tested does not work.',
+        'An organisation that treats its programmers as morons will soon have programmers that are willing and able to act like morons only.',
+        'Anybody who comes to you and says he has a perfect language is either naïve or a salesman.',
+        'C makes it easy to shoot yourself in the foot; C++ makes it harder, but when you do it blows your whole leg off.',
+    ]
+    quote = random.choice(quoteList) + " - Bjarne Stroustrup."
+    await bot.say(quote)
+
+
 
 """
 @bot.command(pass_context=True)
