@@ -13,7 +13,7 @@ import os
 import random
 from discord.ext import commands
 
-version = os.getenv('version')
+versionNumber = os.getenv('version')
 
 token = os.getenv('token')
 
@@ -58,13 +58,13 @@ async def say(*, something):
 @bot.command()
 async def version():
     """Display Bjarne version info."""
-    versionMessage = 'v' + version
+    versionMessage = 'v' + versionNumber
     versionMessage += " - https://github.com/martygrant/uwsgamedevbot"
-    await bot.say('super early, dont expect much yet, details on contributing to Bjarne will come soon')
+    await bot.say(versionMessage)
 
 @bot.command()
 async def bjarnequote():
-    """A quote from Bjarne Stroustrup, creator of C++."""
+    """Get a quote from Bjarne Stroustrup, creator of C++."""
     quoteList = [
         'A program that has not been tested does not work.',
         'An organisation that treats its programmers as morons will soon have programmers that are willing and able to act like morons only.',
