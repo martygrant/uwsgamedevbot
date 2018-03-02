@@ -2,7 +2,7 @@
 
 Bjarne is a Discord server bot built for and maintained by the UWS Game Dev Society.
 
-It is written in Python using discord.py, a wrapper for the Discord API.
+It is written in Python using [discord.py](https://github.com/Rapptz/discord.py) , a wrapper for the Discord API.
 
 ## Contributing
 If you are a member of the society and wish to add features, enhancements or fix bugs your contribution is welcome!
