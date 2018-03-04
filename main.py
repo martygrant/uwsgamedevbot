@@ -12,10 +12,10 @@ import discord
 import os
 import random as rand
 import sys
+from decimal import Decimal
 from discord.ext import commands
 
 versionNumber = os.getenv('version')
-
 token = os.getenv('token')
 
 bot = commands.Bot(description="Below is a listing for Bjarne's commands. Use '!' infront of any of them to execute a command, like '!help'", command_prefix="!")
@@ -107,6 +107,30 @@ async def dice():
     """Roll a dice."""
     await bot.say(rand.randint(0, 6))
 
+@bot.command()
+async def math(*, arg):
+    """Perform math operations, e.g '10 + 20'
+    Supports (+ / * -).
+    """
+    arg = arg.split()
+    operator = arg[1]
+    x = float(arg[0])
+    y = float(arg[2])
+    z = "Error."
+    
+    if operator == "+":
+        z = x + y
+    if operator == "/":
+        z = x / y
+    if operator == "*":
+        z = x * y
+    if operator == "-":
+        z = x - y
+    
+    # Strip trailing 0s if we just have a whole number result
+    z = '%g' % (Decimal(str(z)))
+
+    await bot.say(z)
 
 """
 @bot.command(pass_context=True)
