@@ -121,10 +121,10 @@ async def math(*, arg):
     if arg[0] == "sq":
         x = float(arg[1])
         z = float(x * x)
-    if arg[0] == "sqrt":
+    elif arg[0] == "sqrt":
         x = float(arg[1])
         z = float(pythonmath.sqrt(x))
-    if arg[0] == "pi":
+    elif arg[0] == "pi":
         z = pythonmath.pi
     else:
         operator = arg[1]
