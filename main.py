@@ -130,7 +130,7 @@ async def math(*, arg):
         x = float(arg[0])
         y = float(arg[2])
         if operator == "+":
-        z = x + y
+            z = x + y
         if operator == "/":
             if y == 0:
                 z = "DENIED."
