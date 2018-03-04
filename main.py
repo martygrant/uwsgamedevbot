@@ -12,6 +12,7 @@ import discord
 import os
 import random as rand
 import sys
+import math as pythonmath
 from decimal import Decimal
 from discord.ext import commands
 
