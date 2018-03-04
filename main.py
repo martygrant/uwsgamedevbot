@@ -115,32 +115,35 @@ async def math(*, arg):
     sqrt x - square root of x
     pi - the constant pi
     """
-      arg = arg.split()
-  z = "Error."
-  if arg[0] == "sq":
-    x = float(arg[1])
-    z = float(x * x)
-  if arg[0] == "sqrt":
-    x = float(arg[1])
-    z = float(pythonmath.sqrt(x))
-  if arg[0] == "pi":
-    z = pythonmath.pi
-  else:
-    operator = arg[1]
-    x = float(arg[0])
-    y = float(arg[2])
-    print(arg)
-    if operator == "+":
-      z = x + y
-    if operator == "/":
-      z = x / y
-    if operator == "*":
-      z = x * y
-    if operator == "-":
-      z = x - y
+    arg = arg.split()
+    z = "Error."
+    if arg[0] == "sq":
+        x = float(arg[1])
+        z = float(x * x)
+    if arg[0] == "sqrt":
+        x = float(arg[1])
+        z = float(pythonmath.sqrt(x))
+    if arg[0] == "pi":
+        z = pythonmath.pi
+    else:
+        operator = arg[1]
+        x = float(arg[0])
+        y = float(arg[2])
+        if operator == "+":
+        z = x + y
+        if operator == "/":
+            if y == 0:
+                z = "DENIED."
+            else:
+                z = x / y
+        if operator == "*":
+            z = x * y
+        if operator == "-":
+            z = x - y
     
-    # Strip trailing 0s if we just have a whole number result
-    z = '%g' % (Decimal(str(z)))
+    if z != "DENIED.":
+        # Strip trailing 0s if we just have a whole number result
+        z = '%g' % (Decimal(str(z)))
 
     await bot.say(z)
 
