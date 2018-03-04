@@ -24,8 +24,11 @@ are available on its repo page.
 ## Features
 * Planned
   * Report user to admin/committee.
-  * Random number generator.
   * Automatic member left message.
+  * Hangman.
+  * Voting.
+  * Image search.
+  * Gif search.
 * Implemented
   * Automatic new member welcome message.
   * !say - make Bjarne repeat a message.    
