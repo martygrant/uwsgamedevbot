@@ -110,22 +110,34 @@ async def dice():
 @bot.command()
 async def math(*, arg):
     """Perform math operations, e.g '10 + 20'
-    Supports (+ / * -).
+    Supports: (+ / * -)
+    sq x - square x
+    sqrt x - square root of x
+    pi - the constant pi
     """
-    arg = arg.split()
+      arg = arg.split()
+  z = "Error."
+  if arg[0] == "sq":
+    x = float(arg[1])
+    z = float(x * x)
+  if arg[0] == "sqrt":
+    x = float(arg[1])
+    z = float(pythonmath.sqrt(x))
+  if arg[0] == "pi":
+    z = pythonmath.pi
+  else:
     operator = arg[1]
     x = float(arg[0])
     y = float(arg[2])
-    z = "Error."
-    
+    print(arg)
     if operator == "+":
-        z = x + y
+      z = x + y
     if operator == "/":
-        z = x / y
+      z = x / y
     if operator == "*":
-        z = x * y
+      z = x * y
     if operator == "-":
-        z = x - y
+      z = x - y
     
     # Strip trailing 0s if we just have a whole number result
     z = '%g' % (Decimal(str(z)))
