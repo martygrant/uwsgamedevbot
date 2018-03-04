@@ -10,7 +10,8 @@
 
 import discord
 import os
-import random
+import random as rand
+import sys
 from discord.ext import commands
 
 versionNumber = os.getenv('version')
@@ -74,6 +75,37 @@ async def bjarnequote():
     quote = random.choice(quoteList) + " - Bjarne Stroustrup."
     await bot.say(quote)
 
+@bot.command()
+async def random(*arg):
+    """Generate a random number. Use '!help random' for usage.
+    !random for any random number. 
+    !random x for between 0 and x. 
+    !random x y for between 0 and y.
+    """
+    randomNumber = -1
+    # If no argument passed, get any random number
+    if not arg:
+        randomNumber = rand.randint(0, sys.maxsize)
+    else:
+        # Split argument by spaces if we have more than one argument
+        splitArg = str(arg[0]).split()
+        
+        # If we have 1 argument, get a number between 0 and x
+        if len(arg) == 1:
+            x = int(arg[0])
+            randomNumber = rand.randint(0, x)
+        else:
+            # If we have 2 arguments, get a number between them
+            x = int(arg[0])
+            y = int(arg[1])
+            randomNumber = rand.randint(x, y)
+    
+    await bot.say(randomNumber)
+
+@bot.command()
+async def dice():
+    """Roll a dice."""
+    await bot.say(rand.randint(0, 6))
 
 
 """
