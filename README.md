@@ -1,10 +1,9 @@
 # Bjarne 
 
-Bjarne is a Discord server bot built for and maintained by the UWS Game Dev Society.
-
+Bjarne is a Discord server bot built for and maintained by the UWS Game Dev Society, currently hosted on the Heroku cloud platform.  
 This branch is written in JavaScript using [discord.js](https://github.com/hydrabolt/discord.js), a wrapper for the Discord API.
 
-It is currently hosted on the Heroku cloud platform.
+You may use this framework as a basis for your bot. Simply [fork](https://github.com/martygrant/uwsgamedevbot/tree/node#fork-destination-box) this repo or [download a copy](https://github.com/martygrant/uwsgamedevbot/archive/node.zip) and get programming!
 
 ## Contributing
 If you are a member of the society and wish to add features, enhancements or fix bugs your contribution is welcome!
@@ -15,7 +14,7 @@ To get started you should get the example running from the [discord.js repo](htt
 
 For developing the bot you should create your own bot and run it on your own private server to test out your functions so we can avoid a lot of bother with security tokens and the Bjarne bot being hosted in a cloud server. Once you are happy you can submit a pull request and it can be added to Bjarne.
 
-If you have any questions for making a contribution, or a code related question for your change you can message @midnightpacific or @@Medallyon#5012 on the Discord server.
+If you have any questions for making a contribution, or a code related question for your change you can message [@midnightpacific](https://github.com/martygrant) or [@Medallyon](https://github.com/Medallyon).
 
 ### Requirements
 You will need Node.js v8+ and the [discord.js](https://github.com/hydrabolt/discord.js) library, instructions for installing discord.js 
