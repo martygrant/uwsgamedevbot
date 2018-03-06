@@ -9,7 +9,7 @@ It is currently hosted on the Heroku cloud platform.
 ## Contributing
 If you are a member of the society and wish to add features, enhancements or fix bugs your contribution is welcome!
 
-Feel free to choose an item in the Planned list of the [Features](https://github.com/martygrant/uwsgamedevbot#features) section.
+Feel free to choose an item on the [Issues page](https://github.com/martygrant/uwsgamedevbot/issues) section that you would like to work on. Already implemented features are [listed below](https://github.com/martygrant/uwsgamedevbot#features).
 
 To get started you should get the example running from the [discord.py repo](https://github.com/Rapptz/discord.py) and check out the documentation there. For a more in-depth tutorial there is a really handy [Discord server](https://discord.gg/GWdhBSp) with guides for basic operations.
 
@@ -25,19 +25,11 @@ are available on its repo page.
 * [Medallyon](https://github.com/Medallyon)
 
 ## Features
-* Planned
-  * Report user to admin/committee.
-  * Automatic member left message.
-  * Hangman.
-  * Voting.
-  * Image search.
-  * Gif search.
-* Implemented
-  * Automatic new member welcome message.
-  * !say - make Bjarne repeat a message.    
-  * !bjarnequote - Display a quote from Bjarne Stroupstrup, creator of C++.
-  * !random - Random number generator.
-  * !dice - Roll a 6 sided dice.
+* Automatic new member welcome message.
+* !say - make Bjarne repeat a message.    
+* !bjarnequote - Display a quote from Bjarne Stroupstrup, creator of C++.
+* !random - Random number generator.
+* !dice - Roll a 6 sided dice.
   
 ## Changelog
 * 0.2 - in development.
