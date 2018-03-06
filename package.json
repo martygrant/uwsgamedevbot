@@ -1,0 +1,35 @@
+{
+  "name": "uwsgamedevbot",
+  "version": "0.1",
+  "description": "Discord bot for the UWS Game Dev Society",
+  "main": "index.js",
+  "scripts": {
+    "lint": "./node_modules/.bin/eslint **/*.js",
+    "test": "echo no tests specified"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/martygrant/uwsgamedevbot.git"
+  },
+  "author": "https://github.com/medallyon",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/martygrant/uwsgamedevbot/issues"
+  },
+  "homepage": "https://github.com/martygrant/uwsgamedevbot#readme",
+  "dependencies": {
+    "discord.js": "github:hydrabolt/discord.js#master",
+    "fs-extra": "^5.0.0"
+  },
+  "devDependencies": {
+    "bufferutil": "^3.0.3",
+    "erlpack": "github:discordapp/erlpack",
+    "eslint": "^4.18.1",
+    "eslint-config-google": "^0.9.1",
+    "libsodium-wrappers": "^0.7.3",
+    "node-opus": "^0.2.7",
+    "opusscript": "0.0.6",
+    "sodium": "^1.2.3",
+    "uws": "^9.14.0"
+  }
+}

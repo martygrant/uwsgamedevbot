@@ -1,0 +1,19 @@
+{
+  "env": {
+    "node": true,
+    "es6": true
+  },
+  "extends": "eslint:recommended",
+  "rules": {
+    "brace-style": [ "error", "allman" ],
+    "indent": [ "error", 4, { "VariableDeclarator": 0 } ],
+    "linebreak-style": [ "error", "unix" ],
+    "no-console": 0,
+    "no-trailing-spaces": "error",
+    "quotes": [ "error", "double" ],
+    "semi": [ "error", "always" ]
+  },
+  "globals": {
+    "dClient": true
+  }
+}

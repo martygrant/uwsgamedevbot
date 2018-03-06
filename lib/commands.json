@@ -1,0 +1,52 @@
+{
+  "help": {
+    "description": "Shows help for individual commands.",
+    "alias": [
+      "help",
+      "man"
+    ],
+    "arguments": {
+      "command": {
+        "description": "Shows help for a specified command.",
+        "optional": true
+      }
+    },
+    "permissions": 100,
+    "syntax": "[ command ]"
+  },
+  "version": {
+    "description": "Shows the bot's current version.",
+    "alias": [
+      "version",
+      "v"
+    ],
+    "arguments": {},
+    "permissions": 100,
+    "syntax": ""
+  },
+  "say": {
+    "description": "Repeats a string.",
+    "alias": [
+      "say",
+      "ping"
+    ],
+    "arguments": {
+      "string": {
+        "description": "The string that will be echoed.",
+        "optional": false
+      }
+    },
+    "permissions": 100,
+    "syntax": "Pong!"
+  },
+  "quote": {
+    "description": "Says something only Bjarne would say.",
+    "alias": [
+      "quote",
+      "bjarnequote"
+    ],
+    "arguments": {},
+    "permissions": 100,
+    "syntax": ""
+  }
+}
