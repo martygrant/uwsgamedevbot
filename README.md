@@ -21,6 +21,9 @@ If you have any questions for making a contribution, or a code related question 
 You will need Python 3.4.2+ and the [discord.py](https://github.com/Rapptz/discord.py) library, instructions for installing discord.py 
 are available on its repo page. 
 
+### Contributors
+* [Medallyon](https://github.com/Medallyon)
+
 ## Features
 * Planned
   * Report user to admin/committee.
