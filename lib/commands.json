@@ -48,5 +48,63 @@
     "arguments": {},
     "permissions": 100,
     "syntax": ""
+  },
+  "random": {
+    "description": "Generates a random number.",
+    "alias": [
+      "random",
+      "rnd",
+      "rng",
+      "randint"
+    ],
+    "arguments": {
+      "x": {
+        "description": "The minimum number.",
+        "optional": true
+      },
+      "y": {
+        "description": "The maximum number.",
+        "optional": true
+      }
+    },
+    "permissions": 100,
+    "syntax": "21 420"
+  },
+  "dice": {
+    "description": "Rolls a die.",
+    "alias": [
+      "dice",
+      "die"
+    ],
+    "arguments": {
+      "faces": {
+        "description": "The number of sides. 6 by default.",
+        "optional": true
+      }
+    },
+    "permissions": 100,
+    "syntax": "42"
+  },
+  "math": {
+    "description": "Does some math.",
+    "alias": [
+      "math"
+    ],
+    "arguments": {
+      "number1": {
+        "description": "The first number.",
+        "optional": false
+      },
+      "operator": {
+        "description": "The operator, either `+`, `-`, `*`, `/`, or `^`.",
+        "optional": false
+      },
+      "number2": {
+        "description": "The second number.",
+        "optional": false
+      }
+    },
+    "permissions": 100,
+    "syntax": "[ 21 * 2 ] or [ 420 / 0 ]"
   }
 }
