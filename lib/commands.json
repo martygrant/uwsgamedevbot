@@ -49,6 +49,26 @@
     "permissions": 100,
     "syntax": ""
   },
+  "random": {
+    "description": "Generates a random number.",
+    "alias": [
+      "random",
+      "rnd",
+      "rng",
+      "randint"
+    ],
+    "arguments": {
+      "x": {
+        "description": "The minimum number.",
+        "optional": true
+      },
+      "y": {
+        "description": "The maximum number.",
+        "optional": true
+      }
+    },
+    "permissions": 100,
+    "syntax": "21 420"
   },
   "dice": {
     "description": "Rolls a die.",
