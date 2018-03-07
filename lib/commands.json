@@ -48,5 +48,27 @@
     "arguments": {},
     "permissions": 100,
     "syntax": ""
+  },
+  "math": {
+    "description": "Does some math.",
+    "alias": [
+      "math"
+    ],
+    "arguments": {
+      "number1": {
+        "description": "The first number.",
+        "optional": false
+      },
+      "operator": {
+        "description": "The operator, either `+`, `-`, `*`, `/`, or `^`.",
+        "optional": false
+      },
+      "number2": {
+        "description": "The second number.",
+        "optional": false
+      }
+    },
+    "permissions": 100,
+    "syntax": "[ 21 * 2 ] or [ 420 / 0 ]"
   }
 }
