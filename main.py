@@ -115,6 +115,8 @@ async def math(*, arg):
     sq x - square x
     sqrt x - square root of x
     pi - the constant pi
+    degrees - convert radians to degrees
+    radians - convert degrees to radians
     """
     arg = arg.split()
     z = "Error."
@@ -126,6 +128,12 @@ async def math(*, arg):
         z = float(pythonmath.sqrt(x))
     elif arg[0] == "pi":
         z = pythonmath.pi
+    elif arg[0] == "degrees":
+        x = float(arg[1])
+        z = pythonmath.degrees(x)
+    elif arg[0] == "radians":
+        x = float(arg[1])
+        z = pythonmath.radians(x)
     else:
         operator = arg[1]
         x = float(arg[0])
