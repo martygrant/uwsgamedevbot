@@ -23,15 +23,22 @@ are available on its repo page.
 ## Features
 * Planned
   * Report user to admin/committee.
-  * Random number generator.
   * Automatic member left message.
+  * Hangman.
+  * Voting.
+  * Image search.
+  * Gif search.
 * Implemented
   * Automatic new member welcome message.
   * !say - make Bjarne repeat a message.
   * !bjarnequote - Display a quote from Bjarne Stroupstrup, creator of C++.
+  * !random - Random number generator.
+  * !dice - Roll a 6 sided dice.
   
 ## Changelog
 * 0.2 - in development.
+  * !random - Random number generator.
+  * !dice - Roll a 6 sided dice.
 * 0.1
   * Automatic new member welcome message.
   * !say - Make Bjarne repeat a message.
