@@ -1,6 +1,6 @@
 {
   "name": "uwsgamedevbot",
-  "version": "0.1",
+  "version": "0.0.2",
   "description": "Discord bot for the UWS Game Dev Society",
   "main": "index.js",
   "scripts": {
