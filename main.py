@@ -134,6 +134,12 @@ async def math(*, arg):
     elif arg[0] == "radians":
         x = float(arg[1])
         z = pythonmath.radians(x)
+    elif arg[0] == "roundup":
+        x = float(arg[1])
+        z = pythonmath.ceil(x)
+    elif arg[0] == "rounddown":
+        x = float(arg[1])
+        z = pythonmath.floor(x)
     else:
         operator = arg[1]
         x = float(arg[0])
