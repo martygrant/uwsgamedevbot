@@ -117,6 +117,8 @@ async def math(*, arg):
     pi - the constant pi
     degrees - convert radians to degrees
     radians - convert degrees to radians
+    ceiling - get ceiling of a float, e.g ceil 7.7 = 8
+    floor - get floor of a float, e.g. floor 7.7 = 7
     """
     arg = arg.split()
     z = "Error."
@@ -134,10 +136,10 @@ async def math(*, arg):
     elif arg[0] == "radians":
         x = float(arg[1])
         z = pythonmath.radians(x)
-    elif arg[0] == "roundup":
+    elif arg[0] == "ceiling":
         x = float(arg[1])
         z = pythonmath.ceil(x)
-    elif arg[0] == "rounddown":
+    elif arg[0] == "floor":
         x = float(arg[1])
         z = pythonmath.floor(x)
     else:
