@@ -73,7 +73,7 @@ async def bjarnequote():
         'Anybody who comes to you and says he has a perfect language is either naïve or a salesman.',
         'C makes it easy to shoot yourself in the foot; C++ makes it harder, but when you do it blows your whole leg off.',
     ]
-    quote = random.choice(quoteList) + " - Bjarne Stroustrup."
+    quote = rand.choice(quoteList) + " - Bjarne Stroustrup."
     await bot.say(quote)
 
 @bot.command()
