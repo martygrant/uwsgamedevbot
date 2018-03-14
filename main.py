@@ -164,6 +164,38 @@ async def math(*, arg):
 
     await bot.say(z)
 
+@bot.command(pass_context=True)
+async def quote(ctx, *arg):
+    """Quote a user randomly. Usage: !quote <username>, if no user is specified it will quote yourself."""
+    # If argument is specified find a quote from that user, else 
+    # get a quote from the user who executed the command
+    user = ctx.message.author.name
+    if arg:
+        user = arg[0]
+    
+    # Get a quote from the channel the command was executed in
+    channel = ctx.message.channel
+
+    # Store a list of retrieved messages
+    messages = []
+
+    #lobbyChannel = bot.get_channel('412327350366240768')
+
+    # Get all messages matching the specified user in the channel this command
+    # was executed in. It will only check the last x messages specified by the limit in the
+    # function call below
+    async for message in bot.logs_from(channel, limit=1000):
+        if message.author.name == user:
+            messages.append(message.content)
+
+    # Pick a random message and output it
+    randomMessage = messages[rand.randint(0, len(messages))]
+    output = user
+    output += " once said: `"
+    output += randomMessage
+    output += "`"
+    await bot.say(output)
+
 """
 @bot.command(pass_context=True)
 async def test(ctx):
