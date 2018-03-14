@@ -17,7 +17,7 @@ from decimal import Decimal
 from discord.ext import commands
 
 versionNumber = os.getenv('version')
-token = os.getenv('token')
+token = os.getenv('token') 
 
 bot = commands.Bot(description="Below is a listing for Bjarne's commands. Use '!' infront of any of them to execute a command, like '!help'", command_prefix="!")
 
@@ -51,6 +51,21 @@ async def on_member_join(member):
     # Send above message to new member in a private messag
     welcomeMessage += " Type '!help' for a list of my commands."
     await bot.send_message(member, welcomeMessage)
+
+@bot.event
+async def on_message(message):
+    # If this line isn't used, any commands are ignored as this function
+    # overrides an interal discord.py function
+    await bot.process_commands(message)
+
+    if message.author.id == bot.user.id:
+        return
+    elif "power" in message.content: # Post a daft Palpatine meme if anyone says 'power'
+        embed = discord.Embed()
+        embed.set_image(url="https://i.imgur.com/msS0CHv.jpg")
+        await bot.send_message(message.channel, embed=embed)
+    else:
+        return
 
 @bot.command()
 async def say(*, something):
