@@ -17,7 +17,7 @@ from decimal import Decimal
 from discord.ext import commands
 
 versionNumber = os.getenv('version')
-token = os.getenv('token') 
+token = os.getenv('token')
 
 bot = commands.Bot(description="Below is a listing for Bjarne's commands. Use '!' infront of any of them to execute a command, like '!help'", command_prefix="!")
 
@@ -187,7 +187,15 @@ async def quote(ctx, *arg):
     user = ctx.message.author.name
     if arg:
         user = arg[0]
-    
+        user = ""
+        # If username has spaces, we need to build a string for it and remove the last space
+        for x in arg:
+            user += x
+            user += " "
+        user = user[:-1]
+            
+    print(user)
+
     # Get a quote from the channel the command was executed in
     channel = ctx.message.channel
 
