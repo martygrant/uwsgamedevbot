@@ -240,7 +240,7 @@ async def stopPoll(duration):
 
     await bot.wait_until_ready()
     await asyncio.sleep(duration)
-    channel = bot.get_channel('413882124249071618')
+    channel = bot.get_channel('412327350366240768')
 
     message = "Current poll has now finished. The question was: `"
     message += question
