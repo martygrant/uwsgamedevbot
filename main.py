@@ -13,11 +13,14 @@ import os
 import random as rand
 import sys
 import math as pythonmath
+import string
+import asyncio
+from threading import Timer
 from decimal import Decimal
 from discord.ext import commands
 
 versionNumber = os.getenv('version')
-token = os.getenv('token')
+token = os.getenv('token') 
 
 bot = commands.Bot(description="Below is a listing for Bjarne's commands. Use '!' infront of any of them to execute a command, like '!help'", command_prefix="!")
 
@@ -218,6 +221,164 @@ async def quote(ctx, *arg):
     output += randomMessage
     output += "`"
     await bot.say(output)
+
+
+
+votingActive = False 
+question = ""
+duration = ""
+options = ""
+results = []
+participants = []
+
+async def stopPoll(duration):
+    global votingActive
+    global question
+    global options
+    global results
+    global participants
+
+    await bot.wait_until_ready()
+    await asyncio.sleep(duration)
+    channel = bot.get_channel('413882124249071618')
+
+    message = "Current poll has now finished. The question was: `"
+    message += question
+    message += "` The results are: "
+    
+    await bot.send_message(channel, message) 
+
+    numberOfVotes = 0
+    for x in results:
+        numberOfVotes += x
+
+    for x in range(0, len(options)):
+        message = "`"
+        message += options[x]
+        message += "- "
+        message += str(results[x])
+        message += " ("
+        message += str((results[x] / numberOfVotes) * 100)
+        message += "%)`"
+        await bot.send_message(channel, message)
+
+    message = ""
+
+    message = "Number of voters: " 
+    message += str(len(participants))
+    await bot.send_message(channel, message)
+
+    message = "Type '!poll help' to start a new poll."
+    await bot.send_message(channel, message)
+
+    votingActive = False 
+    question = ""
+    duration = ""
+    options = ""
+    results = []
+    participants = []
+    
+@bot.command()
+async def poll(*, arg=None):
+    """Start a new poll. Usage: !poll -Question -durationInSeconds -Option -Option -Option..."""
+    
+    global votingActive
+    global question
+    global duration
+    global options
+    global results
+    global participants
+
+    if not votingActive:
+        
+        arg = arg.split("-")
+
+        question = arg[1]
+        duration = arg[2]
+        durationFloat = float(duration)
+
+        if durationFloat < 86400:
+            votingActive = True
+
+            bot.loop.create_task(stopPoll(durationFloat))
+
+            arg.pop(0)
+            arg.pop(0)
+            arg.pop(0)
+
+            options = []
+
+            alphabet = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
+
+            for x in range(0, len(arg)):
+                option = alphabet[x]
+                option += ": "
+                option += arg[x]
+                options.append(option)
+                results.append(0)
+
+            print(results)
+
+            prompt = "New poll started! It will close in "
+            prompt += duration
+            prompt += " seconds."
+            prompt += " Use '!vote A' etc. to enter your vote."
+            await bot.say(prompt)
+            prompt = "`"
+            prompt += question
+            prompt += "`"
+            
+            await bot.say(prompt)
+
+            for x in options:
+                opt = "`"
+                opt += x
+                opt += "`"
+                await bot.say(opt)
+        else:
+            await bot.say("Poll cannot last longer than one day (86400 seconds).")
+
+    else:
+        await bot.say("A poll is already active. Use !vote to participate and see how long is left.")
+
+
+@bot.command(pass_context=True)
+async def vote(ctx, *arg):
+    """Use '!vote A' to vote for an option in the current poll. Use '!vote' to see the question."""
+    if votingActive:
+        if not arg:
+            prompt = "`Current poll: "
+            prompt += question
+            prompt += "`"
+            prompt += " Poll closes in "
+            prompt += duration
+            prompt += " seconds. Use !vote A etc to enter your vote."
+            await bot.say(prompt)
+
+            for x in options:
+                opt = "`"
+                opt += x
+                opt += "`"
+                await bot.say(opt)
+
+        else:
+            if ctx.message.author not in participants:
+                arg = arg[0]
+                arg = arg.upper()
+                alphabet = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
+
+                if arg not in alphabet:
+                    await bot.say("Invalid option.")
+                else:
+                    results[alphabet.index(arg)] += 1
+                    participants.append(ctx.message.author)
+                    await bot.say("Vote registered!")
+            else:
+                prompt = ctx.message.author.mention
+                prompt += " you have already voted."
+                await bot.say(prompt)
+    else:
+        await bot.say("No poll active. Use '!poll help' to start a poll.")
 
 """
 @bot.command(pass_context=True)
