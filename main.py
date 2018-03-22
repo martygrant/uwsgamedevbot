@@ -55,6 +55,7 @@ async def on_member_join(member):
     welcomeMessage += " Type '!help' for a list of my commands."
     await bot.send_message(member, welcomeMessage)
 
+"""
 @bot.event
 async def on_message(message):
     # If this line isn't used, any commands are ignored as this function
@@ -69,6 +70,7 @@ async def on_message(message):
         await bot.send_message(message.channel, embed=embed)
     else:
         return
+"""
 
 @bot.command()
 async def say(*, something):
