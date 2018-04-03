@@ -30,11 +30,15 @@ are available on its repo page.
 * !bjarnequote - Display a quote from Bjarne Stroupstrup, creator of C++.
 * !random - Random number generator.
 * !dice - Roll a 6 sided dice.
+* !math - Math operations.
+* !quote - Quote users in the channel, picks a random message they have sent.
   
 ## Changelog
 * 0.2 - in development.
   * !random - Random number generator.
   * !dice - Roll a 6 sided dice.
+  * !math - some basic math functions.
+  * !quote - quote a random message from a user in the channel.
 * 0.1
   * Automatic new member welcome message.
   * !say - Make Bjarne repeat a message.
