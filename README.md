@@ -32,6 +32,7 @@ are available on its repo page.
 * !dice - Roll a 6 sided dice.
 * !math - Math operations.
 * !quote - Quote users in the channel, picks a random message they have sent.
+* Post an "Unlimited Power" Palaptine meme when anyone mentions the word "power" - currently disabled.
   
 ## Changelog
 * 0.2 - in development.
@@ -39,6 +40,7 @@ are available on its repo page.
   * !dice - Roll a 6 sided dice.
   * !math - some basic math functions.
   * !quote - quote a random message from a user in the channel.
+  * Palpatine "power" meme.
 * 0.1
   * Automatic new member welcome message.
   * !say - Make Bjarne repeat a message.
