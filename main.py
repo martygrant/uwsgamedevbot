@@ -51,7 +51,7 @@ async def on_member_join(member):
     welcomeMessage += '. Thanks!'
     await bot.send_message(lobbyChannel, welcomeMessage)
 
-    # Send above message to new member in a private messag
+    # Send above message to new member in a private message
     welcomeMessage += " Type '!help' for a list of my commands."
     await bot.send_message(member, welcomeMessage)
     
@@ -60,7 +60,7 @@ async def on_member_remove(member):
     lobbyChannel = bot.get_channel('412327350366240768')
     
     message = "User " + member.mention
-    message += " has left the server. Goodbye!
+    message += " has left the server. Goodbye!"
     
     await bot.send_message(lobbyChannel, message)
 
