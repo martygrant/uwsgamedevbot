@@ -393,7 +393,7 @@ async def vote(ctx, *arg):
         await bot.say("No poll active. Use '!poll help' to start a poll.")
 
 @bot.command()
-async def weather(arg):
+async def weather(*, arg):
     """Get current weather conditions at a specified location from Yahoo. E.g '!weather glasgow'"""
     weather = Weather(unit=Unit.CELSIUS)
     degree_sign = u'\N{DEGREE SIGN}'
@@ -422,7 +422,7 @@ async def weather(arg):
 
 
 @bot.command()
-async def forecast(arg):
+async def forecast(*, arg):
     """Get the forecast for the next 5 days for a specified location from Yahoo. E.g '!forecast glasgow'"""
     weather = Weather(unit=Unit.CELSIUS)
     degree_sign = u'\N{DEGREE SIGN}'
