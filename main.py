@@ -400,7 +400,7 @@ async def weather(*, arg):
 
     location = weather.lookup_by_location(arg)
 
-    conditions = "("
+    conditions = ""
     conditions += location.title
     conditions += ") - "
     conditions += location.condition.text
