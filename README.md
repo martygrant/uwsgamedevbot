@@ -18,8 +18,9 @@ For developing the bot you should create your own bot and run it in your own pri
 If you have any questions for making a contribution, or a code related question for your change you can message @midnightpacific in the Discord server.
 
 ### Requirements
-You will need Python 3.4.2+ and the [discord.py](https://github.com/Rapptz/discord.py) library, instructions for installing discord.py 
-are available on its repo page. 
+* Python 3.4.2+
+* [discord.py](https://github.com/Rapptz/discord.py)
+* [weather-api](https://pypi.org/project/weather-api/)
 
 ### Contributors
 * [Medallyon](https://github.com/Medallyon)
@@ -33,6 +34,8 @@ are available on its repo page.
 * !math - Math operations.
 * !quote - Quote users in the channel, picks a random message they have sent.
 * Post an "Unlimited Power" Palaptine meme when anyone mentions the word "power" - currently disabled.
+* !weather - current weather conditions for a specified location.
+* !forecast - 5 day weather forecast for a specified location.
   
 ## Changelog
 * 0.2 - in development.
@@ -41,6 +44,8 @@ are available on its repo page.
   * !math - some basic math functions.
   * !quote - quote a random message from a user in the channel.
   * Palpatine "power" meme.
+  * !weather - current weather conditions for a specified location.
+  * !forecast - 5 day weather forecast for a specified location.
 * 0.1
   * Automatic new member welcome message.
   * !say - Make Bjarne repeat a message.
