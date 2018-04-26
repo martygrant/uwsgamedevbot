@@ -1,6 +1,6 @@
 ##### Discord bot for the UWS Game Dev Society, originally developed by Martin Grant
 ##### Created 28/02/2018 
-##### Last Update 2/03/2018
+##### Last Update 26/04/2018
 ##### Version 0.1
 ##### Contributors
 #
@@ -18,6 +18,7 @@ import asyncio
 from threading import Timer
 from decimal import Decimal
 from discord.ext import commands
+from weather import Weather, Unit
 
 versionNumber = os.getenv('version')
 token = os.getenv('token') 
@@ -390,6 +391,60 @@ async def vote(ctx, *arg):
                 await bot.say(prompt)
     else:
         await bot.say("No poll active. Use '!poll help' to start a poll.")
+
+@bot.command()
+async def weather(arg):
+    """Get current weather conditions at a specified location from Yahoo. E.g '!weather glasgow'"""
+    weather = Weather(unit=Unit.CELSIUS)
+    degree_sign = u'\N{DEGREE SIGN}'
+
+    location = weather.lookup_by_location(arg)
+
+    conditions = "("
+    conditions += location.title
+    conditions += ") - "
+    conditions += location.condition.text
+    conditions += " - "
+    conditions += location.condition.temp
+    conditions += degree_sign
+    conditions += location.units.temperature
+    conditions += " - " 
+    conditions += "Humidity: "
+    conditions += location.atmosphere['humidity']
+    conditions += "%"
+    conditions += " - "
+    conditions += "Wind: "
+    conditions += location.wind.speed
+    conditions += " "
+    conditions += location.units.speed
+
+    await bot.say(conditions)
+
+
+@bot.command()
+async def forecast(arg):
+    """Get the forecast for the next 5 days for a specified location from Yahoo. E.g '!forecast glasgow'"""
+    weather = Weather(unit=Unit.CELSIUS)
+    degree_sign = u'\N{DEGREE SIGN}'
+
+    location = weather.lookup_by_location(arg)
+    await bot.say("5 Day Forecast for: " + location.title)
+
+    forecasts = location.forecast
+    count = 0
+    for forecast in forecasts:
+        if count > 4:
+            break
+        forecastOutput = "("
+        forecastOutput += forecast.date
+        forecastOutput += " - "
+        forecastOutput += forecast.text
+        forecastOutput += " - "
+        forecastOutput += "High: " + forecast.high + degree_sign + location.units.temperature
+        forecastOutput += " - Low: "
+        forecastOutput += forecast.low + degree_sign + location.units.temperature
+        count += 1
+        await bot.say(forecastOutput)
 
 """
 @bot.command(pass_context=True)
