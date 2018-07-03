@@ -19,9 +19,10 @@ from threading import Timer
 from decimal import Decimal
 from discord.ext import commands
 from weather import Weather, Unit
+from discord.utils import get
 
-versionNumber = os.getenv('version')
-token = os.getenv('token') 
+versionNumber = '1'
+token = 'NDE2NjY1MDM1MTAwOTEzNjY0.DbC-MA._xig4kz89_jofjkWVdNKnI-3Ksw' 
 
 bot = commands.Bot(description="Below is a listing for Bjarne's commands. Use '!' infront of any of them to execute a command, like '!help'", command_prefix="!")
 
@@ -392,17 +393,24 @@ async def vote(ctx, *arg):
     else:
         await bot.say("No poll active. Use '!poll help' to start a poll.")
 
-@bot.command()
-async def weather(*, arg):
+
+@bot.command(pass_context=True)
+async def weather(ctx, *arg):
     """Get current weather conditions at a specified location from Yahoo. E.g '!weather glasgow'"""
     weather = Weather(unit=Unit.CELSIUS)
     degree_sign = u'\N{DEGREE SIGN}'
 
-    location = weather.lookup_by_location(arg)
+    # Default to glasgow if no argument passed
+    if not arg:
+        city = 'glasgow'
+    else:
+        city = arg[0]
+
+    location = weather.lookup_by_location(city)
 
     conditions = ""
     conditions += location.title
-    conditions += ") - "
+    conditions += " - "
     conditions += location.condition.text
     conditions += " - "
     conditions += location.condition.temp
@@ -421,13 +429,19 @@ async def weather(*, arg):
     await bot.say(conditions)
 
 
-@bot.command()
-async def forecast(*, arg):
+@bot.command(pass_context=True)
+async def forecast(ctx, *arg):
     """Get the forecast for the next 5 days for a specified location from Yahoo. E.g '!forecast glasgow'"""
     weather = Weather(unit=Unit.CELSIUS)
     degree_sign = u'\N{DEGREE SIGN}'
 
-    location = weather.lookup_by_location(arg)
+    # Default to glasgow if no argument passed
+    if not arg:
+        city = 'glasgow'
+    else:
+        city = arg[0]
+
+    location = weather.lookup_by_location(city)
     await bot.say("5 Day Forecast for: " + location.title)
 
     forecasts = location.forecast
@@ -435,7 +449,7 @@ async def forecast(*, arg):
     for forecast in forecasts:
         if count > 4:
             break
-        forecastOutput = "("
+        forecastOutput = ""
         forecastOutput += forecast.date
         forecastOutput += " - "
         forecastOutput += forecast.text
@@ -445,6 +459,8 @@ async def forecast(*, arg):
         forecastOutput += forecast.low + degree_sign + location.units.temperature
         count += 1
         await bot.say(forecastOutput)
+
+
 
 """
 @bot.command(pass_context=True)
