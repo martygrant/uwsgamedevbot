@@ -21,8 +21,8 @@ from discord.ext import commands
 from weather import Weather, Unit
 from discord.utils import get
 
-versionNumber = '1'
-token = 'NDE2NjY1MDM1MTAwOTEzNjY0.DbC-MA._xig4kz89_jofjkWVdNKnI-3Ksw' 
+versionNumber = os.getenv('version')
+token = os.getenv('token') 
 
 bot = commands.Bot(description="Below is a listing for Bjarne's commands. Use '!' infront of any of them to execute a command, like '!help'", command_prefix="!")
 
