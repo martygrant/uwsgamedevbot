@@ -20,125 +20,95 @@ import discord
 from discord.ext import commands
 from weather import Weather, Unit
 
-versionNumber = os.getenv('version')
-token = os.getenv('token') 
+REPOSITORY_URL = "https://github.com/martygrant/uwsgamedevbot"
+VERSION_NUMBER = os.getenv('version')
+BOT_TOKEN = os.getenv('token')
 
-bot = commands.Bot(description="Below is a listing for Bjarne's commands. Use '!' infront of any of them to execute a command, like '!help'", command_prefix="!")
+BOT = commands.Bot(description="""Below is a listing for Bjarne's commands. Use '!' infront of any
+    of them to execute a command, like '!help'""", command_prefix="!")
 
-@bot.event
+@BOT.event
 async def on_ready():
-    print('Logged in as')
-    print(bot.user.name)
-    print(bot.user.id)
-    print('------')
+    """The 'on_ready' event"""
+    print("Logged in as {} ({})\n------".format(BOT.user.name, BOT.user.id))
 
-@bot.event
+@BOT.event
 async def on_member_join(member):
-    # get channel IDs
-    lobbyChannel = bot.get_channel('412327350366240768')
-    rulesChannel = bot.get_channel('405741154643214356')
-    announcementChannel = bot.get_channel('405451914973806602')
-    introductionChannel = bot.get_channel('413835267557031937')
+    """The 'on_member_join' event"""
 
-    # Announce a new member joining in the lobby channel.
-    welcomeMessage = 'Welcome ' + member.mention 
-    welcomeMessage += ' to the UWS Game Dev Society!'
-    welcomeMessage += ' Please check out ' + rulesChannel.mention
-    welcomeMessage += ' and set your server nickname to your real name.'
-    welcomeMessage += ' Visit ' + announcementChannel.mention
-    welcomeMessage += ' to see what events are coming up!'
-    welcomeMessage += ' Why not ' + introductionChannel.mention
-    welcomeMessage += '? Please conduct yourself professionally in public-facing channels like ' + lobbyChannel.mention
-    welcomeMessage += '. Thanks!'
-    await bot.send_message(lobbyChannel, welcomeMessage)
+    # Refresh channel IDs
+    refresh_config()
 
-    # Send above message to new member in a private message
-    welcomeMessage += " Type '!help' for a list of my commands."
-    await bot.send_message(member, welcomeMessage)
-    
-@bot.event
+    welcome_message = """Welcome to the UWS Game Dev Society!
+
+    Please check out {} and set your server nickname to your real name. Visit {} to see what events are coming up! Why not {}?
+
+    Please conduct yourself professionally in public-facing channels like {}. Thanks!
+
+    Type '!help' for a list of my commands.""".format("<#{}>".format(BOT.config.channels.rules), "<#{}>".format(BOT.config.channels.announcements), "<#{}>".format(BOT.config.channels.introductions), "<#{}>".format(BOT.config.channels.lobby))
+
+    # Send the welcome message to the user individually
+    await BOT.send_message(member, welcome_message)
+    # Announce a new member joining in the lobby channel
+    await BOT.send_message(BOT.config.channels.lobby, "Welcome {} to the UWS Game Dev Society!".format(member.mention))
+
+@BOT.event
 async def on_member_remove(member):
-    lobbyChannel = bot.get_channel('412327350366240768')
-    
-    message = "User " + member.mention
-    message += " has left the server. Goodbye!"
-    
-    await bot.send_message(lobbyChannel, message)
+    """The 'on_member_remove' event"""
 
-"""
-@bot.event
-async def on_message(message):
-    # If this line isn't used, any commands are ignored as this function
-    # overrides an interal discord.py function
-    await bot.process_commands(message)
+    await BOT.send_message(BOT.config.channels.lobby, "User {} has left the server. Goodbye!".format(str(member)))
 
-    if message.author.id == bot.user.id:
-        return
-    elif "power" in message.content: # Post a daft Palpatine meme if anyone says 'power'
-        embed = discord.Embed()
-        embed.set_image(url="https://i.imgur.com/msS0CHv.jpg")
-        await bot.send_message(message.channel, embed=embed)
-    else:
-        return
-"""
-
-@bot.command()
+@BOT.command()
 async def say(*, something):
     """Make Bjarne say something."""
-    await bot.say(something)
+    await BOT.say(something)
 
-@bot.command()
+@BOT.command()
 async def version():
     """Display Bjarne version info."""
-    versionMessage = 'v' + versionNumber
-    versionMessage += " - https://github.com/martygrant/uwsgamedevbot"
-    await bot.say(versionMessage)
+    await BOT.say("v{} - {}".format(VERSION_NUMBER, REPOSITORY_URL))
 
-@bot.command()
+@BOT.command()
 async def bjarnequote():
     """Get a quote from Bjarne Stroustrup, creator of C++."""
-    quoteList = [
+    quotes = [
         'A program that has not been tested does not work.',
         'An organisation that treats its programmers as morons will soon have programmers that are willing and able to act like morons only.',
         'Anybody who comes to you and says he has a perfect language is either naïve or a salesman.',
         'C makes it easy to shoot yourself in the foot; C++ makes it harder, but when you do it blows your whole leg off.',
     ]
-    quote = rand.choice(quoteList) + " - Bjarne Stroustrup."
-    await bot.say(quote)
+    await BOT.say(rand.choice(quotes) + " - Bjarne Stroustrup.")
 
-@bot.command()
+@BOT.command()
 async def random(*arg):
     """Generate a random number. Use '!help random' for usage.
-    !random for any random number. 
-    !random x for between 0 and x. 
+    !random for any random number.
+    !random x for between 0 and x.
     !random x y for between 0 and y.
     """
-    randomNumber = -1
+    random_number = -1
     # If no argument passed, get any random number
     if not arg:
-        randomNumber = rand.randint(0, sys.maxsize)
+        random_number = rand.randint(0, sys.maxsize)
     else:
-        # Split argument by spaces if we have more than one argument
-        splitArg = str(arg[0]).split()
-        
         # If we have 1 argument, get a number between 0 and x
         if len(arg) == 1:
             x = int(arg[0])
-            randomNumber = rand.randint(0, x)
+            random_number = rand.randint(0, x)
         else:
             # If we have 2 arguments, get a number between them
             x = int(arg[0])
             y = int(arg[1])
-            randomNumber = rand.randint(x, y)
-    
-    await bot.say(randomNumber)
+            random_number = rand.randint(x, y)
 
-@bot.command()
+    await BOT.say(random_number)
+
+@BOT.command()
 async def dice():
     """Roll a dice."""
-    await bot.say(rand.randint(0, 6))
+    await BOT.say(rand.randint(0, 6))
 
-@bot.command()
+@BOT.command()
 async def math(*, arg):
     """Perform math operations, e.g '10 + 20'
     Supports: (+ / * -)
@@ -187,22 +157,18 @@ async def math(*, arg):
             z = x * y
         if operator == "-":
             z = x - y
-    
+
     if z != "DENIED.":
         # Strip trailing 0s if we just have a whole number result
         z = '%g' % (Decimal(str(z)))
 
-    await bot.say(z)
+    await BOT.say(z)
 
-
-@bot.command(pass_context=True)
+@BOT.command(pass_context=True)
 async def quote(ctx, *arg):
     """Quote a user randomly. Usage: !quote <username>, if no user is specified it will quote yourself."""
     channel = ctx.message.channel
     messages = []
-
-    username = ctx.message.author.name
-    nickname = ctx.message.author.nick
 
     user = ctx.message.author.nick
     if arg:
@@ -216,19 +182,11 @@ async def quote(ctx, *arg):
 
     user = user.lower()
 
-    async for message in bot.logs_from(channel, limit=2000):
+    async for message in BOT.logs_from(channel, limit=2000):
         if message.author.nick.lower() == user:
             messages.append(message.content)
 
     # Pick a random message and output it
-    randomMessage = messages[rand.randint(0, len(messages))]
-    output = user
-    output += " once said: `"
-    output += randomMessage
-    output += "`"
-    await bot.say(output)    
-
-
 
 votingActive = False 
 question = ""
@@ -341,6 +299,13 @@ async def poll(*, arg=None):
                 opt += x
                 opt += "`"
                 await bot.say(opt)
+
+ALPHABET = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q',
+            'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
+def resolve_emoji_from_alphabet(letter):
+    """Returns the emoji representation of a letter"""
+    return chr(ord(letter) + 127365)
+
         else:
             await bot.say("Poll cannot last longer than one day (86400 seconds).")
 
@@ -387,10 +352,10 @@ async def vote(ctx, *arg):
         await bot.say("No poll active. Use '!poll help' to start a poll.")
 
 
-@bot.command(pass_context=True)
-async def weather(ctx, *arg):
+@BOT.command()
+async def weather(*arg):
     """Get current weather conditions at a specified location from Yahoo. E.g '!weather glasgow'"""
-    weather = Weather(unit=Unit.CELSIUS)
+    weather_object = Weather(unit=Unit.CELSIUS)
     degree_sign = u'\N{DEGREE SIGN}'
 
     # Default to glasgow if no argument passed
@@ -399,33 +364,21 @@ async def weather(ctx, *arg):
     else:
         city = arg[0]
 
-    location = weather.lookup_by_location(city)
+    location = weather_object.lookup_by_location(city)
 
-    conditions = ""
-    conditions += location.title
-    conditions += " - "
-    conditions += location.condition.text
-    conditions += " - "
-    conditions += location.condition.temp
-    conditions += degree_sign
-    conditions += location.units.temperature
-    conditions += " - " 
-    conditions += "Humidity: "
-    conditions += location.atmosphere['humidity']
-    conditions += "%"
-    conditions += " - "
-    conditions += "Wind: "
-    conditions += location.wind.speed
-    conditions += " "
-    conditions += location.units.speed
+    embed = discord.Embed(type="rich", colour=generate_random_colour(), timestamp=datetime.now())
+    embed.set_author(name=location.title)
+    embed.add_field(name="Temperature", value="{}{}{}".format(location.condition.temp, degree_sign, location.units.temperature))
+    embed.add_field(name="Condition", value=location.condition.text)
+    embed.add_field(name="Humidity", value="{}%".format(location.atmosphere["humidity"]))
+    embed.add_field(name="Wind", value="{} {}".format(location.wind.speed, location.units.speed))
 
-    await bot.say(conditions)
+    await BOT.say(embed=embed)
 
-
-@bot.command(pass_context=True)
-async def forecast(ctx, *arg):
+@BOT.command()
+async def forecast(*arg):
     """Get the forecast for the next 5 days for a specified location from Yahoo. E.g '!forecast glasgow'"""
-    weather = Weather(unit=Unit.CELSIUS)
+    weather_object = Weather(unit=Unit.CELSIUS)
     degree_sign = u'\N{DEGREE SIGN}'
 
     # Default to glasgow if no argument passed
@@ -434,31 +387,18 @@ async def forecast(ctx, *arg):
     else:
         city = arg[0]
 
-    location = weather.lookup_by_location(city)
-    await bot.say("5 Day Forecast for: " + location.title)
-
+    location = weather_object.lookup_by_location(city)
     forecasts = location.forecast
     count = 0
-    for forecast in forecasts:
+    embed = discord.Embed(type="rich", colour=generate_random_colour(), timestamp=datetime.now())
+    embed.set_author(name="5-day forecast for {}".format(location.title))
+
+    for cast in forecasts:
         if count > 4:
             break
-        forecastOutput = ""
-        forecastOutput += forecast.date
-        forecastOutput += " - "
-        forecastOutput += forecast.text
-        forecastOutput += " - "
-        forecastOutput += "High: " + forecast.high + degree_sign + location.units.temperature
-        forecastOutput += " - Low: "
-        forecastOutput += forecast.low + degree_sign + location.units.temperature
         count += 1
-        await bot.say(forecastOutput)
+        embed.add_field(name=cast.date, value="{}\nHigh: {}{}{}\nLow: {}{}{}".format(cast.text, cast.high, degree_sign, location.units.temperature, cast.low, degree_sign, location.units.temperature))
 
+    await BOT.say(embed=embed)
 
-
-"""
-@bot.command(pass_context=True)
-async def test(ctx):
-    await bot.send_message(ctx.message.author, 'test')
-"""
-
-bot.run(token)
+BOT.run(BOT_TOKEN)
