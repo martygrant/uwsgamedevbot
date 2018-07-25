@@ -1,10 +1,10 @@
-##### Discord bot for the UWS Game Dev Society, originally developed by Martin Grant
-##### Created 28/02/2018 
-##### Last Update 26/04/2018
+"""Discord bot for the UWS Game Dev Society, originally developed by Martin Grant"""
+##### Created 28/02/2018
+##### Last Update 25/07/2018
 ##### Version 0.1
 ##### Contributors
 #
-#
+# https://github.com/medallyon
 #
 #####
 
