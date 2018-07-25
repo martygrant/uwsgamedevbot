@@ -8,18 +8,17 @@
 #
 #####
 
-import discord
 import os
 import random as rand
 import sys
+from datetime import datetime, timedelta
+from time import time as timestamp
 import math as pythonmath
-import string
 import asyncio
-from threading import Timer
 from decimal import Decimal
+import discord
 from discord.ext import commands
 from weather import Weather, Unit
-from discord.utils import get
 
 versionNumber = os.getenv('version')
 token = os.getenv('token') 
