@@ -306,7 +306,7 @@ class Poll:
     def embed(self):
         """Constructs a Rich Embed for this poll"""
         e = discord.Embed(type="rich",
-                          description=self.question,
+                          description="This is {}'s poll.".format(self.initiator.mention),
                           timestamp=datetime.now() + timedelta(seconds=self.time_to_stop),
                           colour=generate_random_colour())
 
@@ -315,7 +315,7 @@ class Poll:
             current_votes = len(self.results[ALPHABET[i]])
             e.add_field(name="{}. {}".format(ALPHABET[i].upper(), option), value="{} votes".format(current_votes), inline=True)
 
-        e.set_author(name="{}'s Poll".format(self.initiator.name),
+        e.set_author(name=self.question,
                      icon_url=self.initiator.avatar_url)
         if self.time_left > 0:
             e.set_footer(text="Time remaining: {} seconds".format(self.time_left))
