@@ -24,8 +24,7 @@ REPOSITORY_URL = "https://github.com/martygrant/uwsgamedevbot"
 VERSION_NUMBER = os.getenv('version')
 BOT_TOKEN = os.getenv('token')
 
-BOT = commands.Bot(description="""Below is a listing for Bjarne's commands. Use '!' infront of any
-    of them to execute a command, like '!help'""", command_prefix="!")
+BOT = commands.Bot(description="Below is a listing for Bjarne's commands. Use '!' infront of any of them to execute a command, like '!help'", command_prefix="!")
 
 @BOT.event
 async def on_ready():
