@@ -324,6 +324,8 @@ async def poll(*, arg=None):
                 opt += x
                 opt += "`"
                 await bot.say(opt)
+    random_message = messages[rand.randint(0, len(messages))]
+    await BOT.say("{} once said: `{}`".format(user, random_message))
 
 ALPHABET = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q',
             'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
