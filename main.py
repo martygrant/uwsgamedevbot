@@ -13,6 +13,7 @@ import random as rand
 import sys
 from datetime import datetime, timedelta
 from time import time as timestamp
+import json
 import math as pythonmath
 import asyncio
 from decimal import Decimal
@@ -24,7 +25,23 @@ REPOSITORY_URL = "https://github.com/martygrant/uwsgamedevbot"
 VERSION_NUMBER = os.getenv('version')
 BOT_TOKEN = os.getenv('token')
 
-BOT = commands.Bot(description="Below is a listing for Bjarne's commands. Use '!' infront of any of them to execute a command, like '!help'", command_prefix="!")
+class CustomBot(commands.Bot):
+    """An extension of the discord.py Bot Class"""
+    def __init__(self, command_prefix, formatter=None, description=None, pm_help=False, **options):
+        """Custom constructor that creates a 'config' attribute"""
+        super().__init__(command_prefix, formatter=formatter, description=description, pm_help=pm_help, options=options)
+        self.config = dict()
+
+BOT = CustomBot(description="Below is a listing for Bjarne's commands. Use '!' infront of any of them to execute a command, like '!help'", command_prefix="!")
+
+def refresh_config():
+    """Refreshes the config file and its properties"""
+    config_file = open('config.json', 'r')
+    BOT.config = config_file.read()
+    config_file.close()
+
+    decoder = json.JSONDecoder()
+    BOT.config = decoder.decode(BOT.config)
 
 @BOT.event
 async def on_ready():
@@ -40,22 +57,24 @@ async def on_member_join(member):
 
     welcome_message = """Welcome to the UWS Game Dev Society!
 
-    Please check out {} and set your server nickname to your real name. Visit {} to see what events are coming up! Why not {}?
+Please check out {} and set your server nickname to your real name. Visit {} to see what events are coming up! Why not {}?
+Please conduct yourself professionally in public-facing channels like {}. Thanks!
 
-    Please conduct yourself professionally in public-facing channels like {}. Thanks!
-
-    Type '!help' for a list of my commands.""".format("<#{}>".format(BOT.config.channels.rules), "<#{}>".format(BOT.config.channels.announcements), "<#{}>".format(BOT.config.channels.introductions), "<#{}>".format(BOT.config.channels.lobby))
+Type '!help' for a list of my commands.""".format("<#{}>".format(BOT.config["channels"]["rules"]), "<#{}>".format(BOT.config["channels"]["announcements"]), "<#{}>".format(BOT.config["channels"]["introductions"]), "<#{}>".format(BOT.config["channels"]["lobby"]))
 
     # Send the welcome message to the user individually
     await BOT.send_message(member, welcome_message)
     # Announce a new member joining in the lobby channel
-    await BOT.send_message(BOT.config.channels.lobby, "Welcome {} to the UWS Game Dev Society!".format(member.mention))
+    await BOT.send_message(BOT.config["channels"]["lobby"], "Welcome {} to the UWS Game Dev Society!".format(member.mention))
 
 @BOT.event
 async def on_member_remove(member):
     """The 'on_member_remove' event"""
 
-    await BOT.send_message(BOT.config.channels.lobby, "User {} has left the server. Goodbye!".format(str(member)))
+    # Refresh channel IDs
+    refresh_config()
+
+    await BOT.send_message(BOT.config["channels"]["lobby"], "User **{}** has left the server. Goodbye!".format(str(member)))
 
 @BOT.command()
 async def say(*, something):
