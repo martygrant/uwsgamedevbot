@@ -32,6 +32,12 @@ class CustomBot(commands.Bot):
         super().__init__(command_prefix, formatter=formatter, description=description, pm_help=pm_help, options=options)
         self.config = dict()
 
+    def send_message(self, destination, content=None, *, tts=False, embed=None):
+        """Custom method that allows a channel ID as the 'destination' parameter"""
+        if isinstance(destination, str):
+            return super().send_message(self.get_channel(destination), content, tts=tts, embed=embed)
+        return super().send_message(destination, content, tts=tts, embed=embed)
+
 BOT = CustomBot(description="Below is a listing for Bjarne's commands. Use '!' infront of any of them to execute a command, like '!help'", command_prefix="!")
 
 def refresh_config():
