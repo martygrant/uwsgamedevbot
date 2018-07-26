@@ -276,11 +276,13 @@ async def poll(ctx):
     args.pop(0)
     args.pop(0)
 
+    # Create a list of options and trim any whitespace from the string
     options = []
     for option in args:
         if option.strip() not in options:
             options.append(option.strip())
 
+    # Create a new Poll instance and start it
     new_poll = Poll(question, options, duration_float, ctx.message.author, ctx.message.channel)
     await new_poll.start()
 
@@ -331,16 +333,20 @@ class Poll:
         for i in range(len(self.options)):
             self.results[ALPHABET[i]] = []
 
+        # If a 'message' object already exists, use that
         if isinstance(message, discord.Message):
             self.channel = message.channel
             self.question_message = message
+
+        # If not, create a new message in 'Poll.start()'
         elif isinstance(message, discord.Channel):
             self.channel = message
         else:
             raise TypeError("The \{message\} argument must be of type 'Discord.Message' or 'Discord.Channel'")
 
     async def start(self):
-        """Starts the poll"""
+        """Starts the poll and creates a task for the poll to end using by the duration"""
+        # Send a new message if one wasn't already passed to the constructor
         if self.question_message is None:
             self.question_message = await BOT.send_message(self.channel, embed=self.embed)
         BOT.ongoing_polls[self.question_message.id] = self
