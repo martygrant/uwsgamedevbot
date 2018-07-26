@@ -325,8 +325,8 @@ async def poll(*, arg=None):
                 opt += "`"
                 await bot.say(opt)
 
-ALPHABET = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q',
-            'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
+ALPHABET = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q',
+            'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
 def resolve_emoji_from_alphabet(letter):
     """Returns the emoji representation of a letter"""
     return chr(ord(letter) + 127365)
