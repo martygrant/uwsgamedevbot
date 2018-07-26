@@ -28,9 +28,11 @@ BOT_TOKEN = os.getenv('token')
 class CustomBot(commands.Bot):
     """An extension of the discord.py Bot Class"""
     def __init__(self, command_prefix, formatter=None, description=None, pm_help=False, **options):
-        """Custom constructor that creates a 'config' attribute"""
+        """Custom constructor that creates some custom attributes"""
         super().__init__(command_prefix, formatter=formatter, description=description, pm_help=pm_help, options=options)
+
         self.config = dict()
+        self.ongoing_polls = dict()
 
     def send_message(self, destination, content=None, *, tts=False, embed=None):
         """Custom method that allows a channel ID as the 'destination' parameter"""
@@ -81,6 +83,40 @@ async def on_member_remove(member):
     refresh_config()
 
     await BOT.send_message(BOT.config["channels"]["lobby"], "User **{}** has left the server. Goodbye!".format(str(member)))
+
+@BOT.event
+async def on_reaction_add(reaction, user):
+    """The 'on_reaction_add' event"""
+    if reaction.message.id not in BOT.ongoing_polls or user.id == BOT.user.id:
+        return
+
+    current_poll = BOT.ongoing_polls[reaction.message.id]
+    # If the reaction is the same as any of the existing reactions
+    if any(resolve_emoji_from_alphabet(option) == reaction.emoji for option in current_poll.results.keys()):
+        # Add the user to the respective result object
+        selected_option = resolve_letter_from_emoji(reaction.emoji)
+        if user.id not in current_poll.results[selected_option]:
+            current_poll.results[selected_option].append(user.id)
+
+        # Update the original poll message
+        await BOT.edit_message(current_poll.question_message, embed=current_poll.embed)
+
+@BOT.event
+async def on_reaction_remove(reaction, user):
+    """The 'on_reaction_remove' event"""
+    if reaction.message.id not in BOT.ongoing_polls or user.id == BOT.user.id:
+        return
+
+    current_poll = BOT.ongoing_polls[reaction.message.id]
+    # If the reaction is the same as any of the existing reactions
+    if any(resolve_emoji_from_alphabet(option) == reaction.emoji for option in current_poll.results.keys()):
+        # Remove the user from the respective result object
+        deselected_option = resolve_letter_from_emoji(reaction.emoji)
+        if user.id in current_poll.results[deselected_option]:
+            current_poll.results[deselected_option].remove(user.id)
+
+        # Update the original poll message
+        await BOT.edit_message(current_poll.question_message, embed=current_poll.embed)
 
 @BOT.command()
 async def say(*something):
@@ -212,118 +248,6 @@ async def quote(ctx, *arg):
             messages.append(message.content)
 
     # Pick a random message and output it
-
-votingActive = False 
-question = ""
-duration = ""
-options = ""
-results = []
-participants = []
-
-async def stopPoll(duration):
-    global votingActive
-    global question
-    global options
-    global results
-    global participants
-
-    await bot.wait_until_ready()
-    await asyncio.sleep(duration)
-    channel = bot.get_channel('412327350366240768')
-
-    message = "Current poll has now finished. The question was: `"
-    message += question
-    message += "` The results are: "
-    
-    await bot.send_message(channel, message) 
-
-    numberOfVotes = 0
-    for x in results:
-        numberOfVotes += x
-
-    for x in range(0, len(options)):
-        message = "`"
-        message += options[x]
-        message += "- "
-        message += str(results[x])
-        message += " ("
-        message += str((results[x] / numberOfVotes) * 100)
-        message += "%)`"
-        await bot.send_message(channel, message)
-
-    message = ""
-
-    message = "Number of voters: " 
-    message += str(len(participants))
-    await bot.send_message(channel, message)
-
-    message = "Type '!poll help' to start a new poll."
-    await bot.send_message(channel, message)
-
-    votingActive = False 
-    question = ""
-    duration = ""
-    options = ""
-    results = []
-    participants = []
-    
-@bot.command()
-async def poll(*, arg=None):
-    """Start a new poll. Usage: !poll -Question -durationInSeconds -Option -Option -Option..."""
-    
-    global votingActive
-    global question
-    global duration
-    global options
-    global results
-    global participants
-
-    if not votingActive:
-        
-        arg = arg.split("-")
-
-        question = arg[1]
-        duration = arg[2]
-        durationFloat = float(duration)
-
-        if durationFloat < 86400:
-            votingActive = True
-
-            bot.loop.create_task(stopPoll(durationFloat))
-
-            arg.pop(0)
-            arg.pop(0)
-            arg.pop(0)
-
-            options = []
-
-            alphabet = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
-
-            for x in range(0, len(arg)):
-                option = alphabet[x]
-                option += ": "
-                option += arg[x]
-                options.append(option)
-                results.append(0)
-
-            print(results)
-
-            prompt = "New poll started! It will close in "
-            prompt += duration
-            prompt += " seconds."
-            prompt += " Use '!vote A' etc. to enter your vote."
-            await bot.say(prompt)
-            prompt = "`"
-            prompt += question
-            prompt += "`"
-            
-            await bot.say(prompt)
-
-            for x in options:
-                opt = "`"
-                opt += x
-                opt += "`"
-                await bot.say(opt)
     random_message = messages[rand.randint(0, len(messages))]
     await BOT.say("{} once said: `{}`".format(user, random_message))
 
@@ -333,6 +257,33 @@ def resolve_emoji_from_alphabet(letter):
     """Returns the emoji representation of a letter"""
     return chr(ord(letter) + 127365)
 
+def resolve_letter_from_emoji(emoji):
+    """Returns the character representation of a letter emoji (in lowercase)"""
+    return chr(ord(emoji) - 127365)
+
+@BOT.command(pass_context=True)
+async def poll(ctx):
+    """Starts a new poll. Usage: !poll -Question -durationInSeconds -Option -Option -Option..."""
+    args = ctx.message.content.split("-")
+    question = args[1]
+    duration = args[2]
+
+    duration_float = float(duration)
+    if duration_float > 86400:
+        return await BOT.say("Poll cannot last longer than one day (86400 seconds).")
+
+    args.pop(0)
+    args.pop(0)
+    args.pop(0)
+
+    options = []
+    for option in args:
+        if option.strip() not in options:
+            options.append(option.strip())
+
+    new_poll = Poll(question, options, duration_float, ctx.message.author, ctx.message.channel)
+    await new_poll.start()
+
 def generate_random_colour():
     """Generates a random colour decimal"""
     letters = "0123456789ABCDEF"
@@ -341,51 +292,77 @@ def generate_random_colour():
         colour_string += rand.choice(letters)
     return int(colour_string, 16)
 
+class Poll:
+    """An instance of this class handles the creation of a poll and monitoring of reactions"""
+
+    @property
+    def time_left(self):
+        """Gets the time left for this instance of the poll (in seconds)"""
+        return (timestamp() / 1000) - self.time_to_stop
+
+    @property
+    def embed(self):
+        """Constructs a Rich Embed for this poll"""
+        e = discord.Embed(type="rich",
+                          description=self.question,
+                          timestamp=datetime.now() + timedelta(seconds=self.time_to_stop),
+                          colour=generate_random_colour())
+
+        e.add_field(name="\u200b", value="**Options**", inline=False)
+        for i, option in enumerate(self.options):
+            current_votes = len(self.results[ALPHABET[i]])
+            e.add_field(name="{}. {}".format(ALPHABET[i].upper(), option), value="{} votes".format(current_votes), inline=True)
+
+        e.set_author(name="{}'s Poll".format(self.initiator.name),
+                     icon_url=self.initiator.avatar_url)
+        if self.time_left > 0:
+            e.set_footer(text="Time remaining: {} seconds".format(self.time_left))
+
+        return e
+
+    def __init__(self, question, options, duration, owner, message=None):
+        self.question = question
+        self.question_message = None
+        self.options = options
+        self.duration = duration
+        self.time_to_stop = (timestamp() / 1000) + duration
+        self.initiator = owner
+        self.results = {}
+        for i in range(len(self.options)):
+            self.results[ALPHABET[i]] = []
+
+        if isinstance(message, discord.Message):
+            self.channel = message.channel
+            self.question_message = message
+        elif isinstance(message, discord.Channel):
+            self.channel = message
         else:
-            await bot.say("Poll cannot last longer than one day (86400 seconds).")
+            raise TypeError("The \{message\} argument must be of type 'Discord.Message' or 'Discord.Channel'")
 
-    else:
-        await bot.say("A poll is already active. Use !vote to participate and see how long is left.")
+    async def start(self):
+        """Starts the poll"""
+        if self.question_message is None:
+            self.question_message = await BOT.send_message(self.channel, embed=self.embed)
+        BOT.ongoing_polls[self.question_message.id] = self
 
+        await self.add_reactions()
+        BOT.loop.create_task(self.stop())
 
-@bot.command(pass_context=True)
-async def vote(ctx, *arg):
-    """Use '!vote A' to vote for an option in the current poll. Use '!vote' to see the question."""
-    if votingActive:
-        if not arg:
-            prompt = "`Current poll: "
-            prompt += question
-            prompt += "`"
-            prompt += " Poll closes in "
-            prompt += duration
-            prompt += " seconds. Use !vote A etc to enter your vote."
-            await bot.say(prompt)
+    async def stop(self):
+        """Stops the poll and posts the results"""
 
-            for x in options:
-                opt = "`"
-                opt += x
-                opt += "`"
-                await bot.say(opt)
+        await BOT.wait_until_ready()
+        await asyncio.sleep(self.duration)
 
-        else:
-            if ctx.message.author not in participants:
-                arg = arg[0]
-                arg = arg.upper()
-                alphabet = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
+        # TODO: finalise data to prettify output
 
-                if arg not in alphabet:
-                    await bot.say("Invalid option.")
-                else:
-                    results[alphabet.index(arg)] += 1
-                    participants.append(ctx.message.author)
-                    await bot.say("Vote registered!")
-            else:
-                prompt = ctx.message.author.mention
-                prompt += " you have already voted."
-                await bot.say(prompt)
-    else:
-        await bot.say("No poll active. Use '!poll help' to start a poll.")
+        await BOT.send_message(self.channel, "**{}**'s poll has finished. Here are the results.".format(self.initiator.name), embed=self.embed)
+        BOT.ongoing_polls.pop(self.question_message.id, self)
 
+    async def add_reactions(self):
+        """Adds the respective reactions for each option for users to react to"""
+        for i in range(len(self.options)):
+            await BOT.add_reaction(self.question_message, resolve_emoji_from_alphabet(ALPHABET[i].lower()))
 
 @BOT.command()
 async def weather(*arg):
