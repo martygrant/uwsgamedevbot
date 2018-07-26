@@ -331,6 +331,14 @@ def resolve_emoji_from_alphabet(letter):
     """Returns the emoji representation of a letter"""
     return chr(ord(letter) + 127365)
 
+def generate_random_colour():
+    """Generates a random colour decimal"""
+    letters = "0123456789ABCDEF"
+    colour_string = ""
+    for i in range(6):
+        colour_string += rand.choice(letters)
+    return int(colour_string, 16)
+
         else:
             await bot.say("Poll cannot last longer than one day (86400 seconds).")
 
