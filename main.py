@@ -77,9 +77,10 @@ async def on_member_remove(member):
     await BOT.send_message(BOT.config["channels"]["lobby"], "User **{}** has left the server. Goodbye!".format(str(member)))
 
 @BOT.command()
-async def say(*, something):
+async def say(*something):
     """Make Bjarne say something."""
-    await BOT.say(something)
+    if something:
+        await BOT.say(" ".join(something))
 
 @BOT.command()
 async def version():
