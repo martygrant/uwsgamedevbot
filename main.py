@@ -1,145 +1,175 @@
-##### Discord bot for the UWS Game Dev Society, originally developed by Martin Grant
-##### Created 28/02/2018 
-##### Last Update 26/04/2018
+"""Discord bot for the UWS Game Dev Society, originally developed by Martin Grant"""
+##### Created 28/02/2018
+##### Last Update 25/07/2018
 ##### Version 0.1
 ##### Contributors
 #
-#
+# https://github.com/medallyon
 #
 #####
 
-import discord
 import os
 import random as rand
 import sys
+from datetime import datetime, timedelta
+from time import time as timestamp
+import json
 import math as pythonmath
-import string
 import asyncio
-from threading import Timer
 from decimal import Decimal
+import discord
 from discord.ext import commands
 from weather import Weather, Unit
-from discord.utils import get
 
-versionNumber = os.getenv('version')
-token = os.getenv('token') 
+REPOSITORY_URL = "https://github.com/martygrant/uwsgamedevbot"
+VERSION_NUMBER = os.getenv('version')
+BOT_TOKEN = os.getenv('token')
 
-bot = commands.Bot(description="Below is a listing for Bjarne's commands. Use '!' infront of any of them to execute a command, like '!help'", command_prefix="!")
+class CustomBot(commands.Bot):
+    """An extension of the discord.py Bot Class"""
+    def __init__(self, command_prefix, formatter=None, description=None, pm_help=False, **options):
+        """Custom constructor that creates some custom attributes"""
+        super().__init__(command_prefix, formatter=formatter, description=description, pm_help=pm_help, options=options)
 
-@bot.event
+        self.config = dict()
+        self.ongoing_polls = dict()
+
+    def send_message(self, destination, content=None, *, tts=False, embed=None):
+        """Custom method that allows a channel ID as the 'destination' parameter"""
+        if isinstance(destination, str):
+            return super().send_message(self.get_channel(destination), content, tts=tts, embed=embed)
+        return super().send_message(destination, content, tts=tts, embed=embed)
+
+BOT = CustomBot(description="Below is a listing for Bjarne's commands. Use '!' infront of any of them to execute a command, like '!help'", command_prefix="!")
+
+def refresh_config():
+    """Refreshes the config file and its properties"""
+    config_file = open('config.json', 'r')
+    BOT.config = config_file.read()
+    config_file.close()
+
+    decoder = json.JSONDecoder()
+    BOT.config = decoder.decode(BOT.config)
+
+@BOT.event
 async def on_ready():
-    print('Logged in as')
-    print(bot.user.name)
-    print(bot.user.id)
-    print('------')
+    """The 'on_ready' event"""
+    print("Logged in as {} ({})\n------".format(BOT.user.name, BOT.user.id))
 
-@bot.event
+@BOT.event
 async def on_member_join(member):
-    # get channel IDs
-    lobbyChannel = bot.get_channel('412327350366240768')
-    rulesChannel = bot.get_channel('405741154643214356')
-    announcementChannel = bot.get_channel('405451914973806602')
-    introductionChannel = bot.get_channel('413835267557031937')
+    """The 'on_member_join' event"""
 
-    # Announce a new member joining in the lobby channel.
-    welcomeMessage = 'Welcome ' + member.mention 
-    welcomeMessage += ' to the UWS Game Dev Society!'
-    welcomeMessage += ' Please check out ' + rulesChannel.mention
-    welcomeMessage += ' and set your server nickname to your real name.'
-    welcomeMessage += ' Visit ' + announcementChannel.mention
-    welcomeMessage += ' to see what events are coming up!'
-    welcomeMessage += ' Why not ' + introductionChannel.mention
-    welcomeMessage += '? Please conduct yourself professionally in public-facing channels like ' + lobbyChannel.mention
-    welcomeMessage += '. Thanks!'
-    await bot.send_message(lobbyChannel, welcomeMessage)
+    # Refresh channel IDs
+    refresh_config()
 
-    # Send above message to new member in a private message
-    welcomeMessage += " Type '!help' for a list of my commands."
-    await bot.send_message(member, welcomeMessage)
-    
-@bot.event
+    welcome_message = """Welcome to the UWS Game Dev Society!
+
+Please check out {} and set your server nickname to your real name. Visit {} to see what events are coming up! Why not {}?
+Please conduct yourself professionally in public-facing channels like {}. Thanks!
+
+Type '!help' for a list of my commands.""".format("<#{}>".format(BOT.config["channels"]["rules"]), "<#{}>".format(BOT.config["channels"]["announcements"]), "<#{}>".format(BOT.config["channels"]["introductions"]), "<#{}>".format(BOT.config["channels"]["lobby"]))
+
+    # Send the welcome message to the user individually
+    await BOT.send_message(member, welcome_message)
+    # Announce a new member joining in the lobby channel
+    await BOT.send_message(BOT.config["channels"]["lobby"], "Welcome {} to the UWS Game Dev Society!".format(member.mention))
+
+@BOT.event
 async def on_member_remove(member):
-    lobbyChannel = bot.get_channel('412327350366240768')
-    
-    message = "User " + member.mention
-    message += " has left the server. Goodbye!"
-    
-    await bot.send_message(lobbyChannel, message)
+    """The 'on_member_remove' event"""
 
-"""
-@bot.event
-async def on_message(message):
-    # If this line isn't used, any commands are ignored as this function
-    # overrides an interal discord.py function
-    await bot.process_commands(message)
+    # Refresh channel IDs
+    refresh_config()
 
-    if message.author.id == bot.user.id:
+    await BOT.send_message(BOT.config["channels"]["lobby"], "User **{}** has left the server. Goodbye!".format(str(member)))
+
+@BOT.event
+async def on_reaction_add(reaction, user):
+    """The 'on_reaction_add' event"""
+    if reaction.message.id not in BOT.ongoing_polls or user.id == BOT.user.id:
         return
-    elif "power" in message.content: # Post a daft Palpatine meme if anyone says 'power'
-        embed = discord.Embed()
-        embed.set_image(url="https://i.imgur.com/msS0CHv.jpg")
-        await bot.send_message(message.channel, embed=embed)
-    else:
-        return
-"""
 
-@bot.command()
-async def say(*, something):
+    current_poll = BOT.ongoing_polls[reaction.message.id]
+    # If the reaction is the same as any of the existing reactions
+    if any(resolve_emoji_from_alphabet(option) == reaction.emoji for option in current_poll.results.keys()):
+        # Add the user to the respective result object
+        selected_option = resolve_letter_from_emoji(reaction.emoji)
+        if user.id not in current_poll.results[selected_option]:
+            current_poll.results[selected_option].append(user.id)
+
+        # Update the original poll message
+        await BOT.edit_message(current_poll.question_message, embed=current_poll.embed)
+
+@BOT.event
+async def on_reaction_remove(reaction, user):
+    """The 'on_reaction_remove' event"""
+    if reaction.message.id not in BOT.ongoing_polls or user.id == BOT.user.id:
+        return
+
+    current_poll = BOT.ongoing_polls[reaction.message.id]
+    # If the reaction is the same as any of the existing reactions
+    if any(resolve_emoji_from_alphabet(option) == reaction.emoji for option in current_poll.results.keys()):
+        # Remove the user from the respective result object
+        deselected_option = resolve_letter_from_emoji(reaction.emoji)
+        if user.id in current_poll.results[deselected_option]:
+            current_poll.results[deselected_option].remove(user.id)
+
+        # Update the original poll message
+        await BOT.edit_message(current_poll.question_message, embed=current_poll.embed)
+
+@BOT.command()
+async def say(*something):
     """Make Bjarne say something."""
-    await bot.say(something)
+    if something:
+        await BOT.say(" ".join(something))
 
-@bot.command()
+@BOT.command()
 async def version():
     """Display Bjarne version info."""
-    versionMessage = 'v' + versionNumber
-    versionMessage += " - https://github.com/martygrant/uwsgamedevbot"
-    await bot.say(versionMessage)
+    await BOT.say("v{} - {}".format(VERSION_NUMBER, REPOSITORY_URL))
 
-@bot.command()
+@BOT.command()
 async def bjarnequote():
     """Get a quote from Bjarne Stroustrup, creator of C++."""
-    quoteList = [
+    quotes = [
         'A program that has not been tested does not work.',
         'An organisation that treats its programmers as morons will soon have programmers that are willing and able to act like morons only.',
         'Anybody who comes to you and says he has a perfect language is either naïve or a salesman.',
         'C makes it easy to shoot yourself in the foot; C++ makes it harder, but when you do it blows your whole leg off.',
     ]
-    quote = rand.choice(quoteList) + " - Bjarne Stroustrup."
-    await bot.say(quote)
+    await BOT.say(rand.choice(quotes) + " - Bjarne Stroustrup.")
 
-@bot.command()
+@BOT.command()
 async def random(*arg):
     """Generate a random number. Use '!help random' for usage.
-    !random for any random number. 
-    !random x for between 0 and x. 
+    !random for any random number.
+    !random x for between 0 and x.
     !random x y for between 0 and y.
     """
-    randomNumber = -1
+    random_number = -1
     # If no argument passed, get any random number
     if not arg:
-        randomNumber = rand.randint(0, sys.maxsize)
+        random_number = rand.randint(0, sys.maxsize)
     else:
-        # Split argument by spaces if we have more than one argument
-        splitArg = str(arg[0]).split()
-        
         # If we have 1 argument, get a number between 0 and x
         if len(arg) == 1:
             x = int(arg[0])
-            randomNumber = rand.randint(0, x)
+            random_number = rand.randint(0, x)
         else:
             # If we have 2 arguments, get a number between them
             x = int(arg[0])
             y = int(arg[1])
-            randomNumber = rand.randint(x, y)
-    
-    await bot.say(randomNumber)
+            random_number = rand.randint(x, y)
 
-@bot.command()
+    await BOT.say(random_number)
+
+@BOT.command()
 async def dice():
     """Roll a dice."""
-    await bot.say(rand.randint(0, 6))
+    await BOT.say(rand.randint(0, 6))
 
-@bot.command()
+@BOT.command()
 async def math(*, arg):
     """Perform math operations, e.g '10 + 20'
     Supports: (+ / * -)
@@ -188,22 +218,18 @@ async def math(*, arg):
             z = x * y
         if operator == "-":
             z = x - y
-    
+
     if z != "DENIED.":
         # Strip trailing 0s if we just have a whole number result
         z = '%g' % (Decimal(str(z)))
 
-    await bot.say(z)
+    await BOT.say(z)
 
-
-@bot.command(pass_context=True)
+@BOT.command(pass_context=True)
 async def quote(ctx, *arg):
     """Quote a user randomly. Usage: !quote <username>, if no user is specified it will quote yourself."""
     channel = ctx.message.channel
     messages = []
-
-    username = ctx.message.author.name
-    nickname = ctx.message.author.nick
 
     user = ctx.message.author.nick
     if arg:
@@ -217,181 +243,137 @@ async def quote(ctx, *arg):
 
     user = user.lower()
 
-    async for message in bot.logs_from(channel, limit=2000):
+    async for message in BOT.logs_from(channel, limit=2000):
         if message.author.nick.lower() == user:
             messages.append(message.content)
 
     # Pick a random message and output it
-    randomMessage = messages[rand.randint(0, len(messages))]
-    output = user
-    output += " once said: `"
-    output += randomMessage
-    output += "`"
-    await bot.say(output)    
+    random_message = messages[rand.randint(0, len(messages))]
+    await BOT.say("{} once said: `{}`".format(user, random_message))
 
+ALPHABET = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q',
+            'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
+def resolve_emoji_from_alphabet(letter):
+    """Returns the emoji representation of a letter"""
+    return chr(ord(letter) + 127365)
 
+def resolve_letter_from_emoji(emoji):
+    """Returns the character representation of a letter emoji (in lowercase)"""
+    return chr(ord(emoji) - 127365)
 
-votingActive = False 
-question = ""
-duration = ""
-options = ""
-results = []
-participants = []
+@BOT.command(pass_context=True)
+async def poll(ctx):
+    """Starts a new poll. Usage: !poll -Question -durationInSeconds -Option -Option -Option..."""
+    args = ctx.message.content.split("-")
+    question = args[1]
+    duration = args[2]
 
-async def stopPoll(duration):
-    global votingActive
-    global question
-    global options
-    global results
-    global participants
+    duration_float = float(duration)
+    if duration_float > 86400:
+        return await BOT.say("Poll cannot last longer than one day (86400 seconds).")
 
-    await bot.wait_until_ready()
-    await asyncio.sleep(duration)
-    channel = bot.get_channel('412327350366240768')
+    args.pop(0)
+    args.pop(0)
+    args.pop(0)
 
-    message = "Current poll has now finished. The question was: `"
-    message += question
-    message += "` The results are: "
-    
-    await bot.send_message(channel, message) 
+    # Create a list of options and trim any whitespace from the string
+    options = []
+    for option in args:
+        if option.strip() not in options:
+            options.append(option.strip())
 
-    numberOfVotes = 0
-    for x in results:
-        numberOfVotes += x
+    # Create a new Poll instance and start it
+    new_poll = Poll(question, options, duration_float, ctx.message.author, ctx.message.channel)
+    await new_poll.start()
 
-    for x in range(0, len(options)):
-        message = "`"
-        message += options[x]
-        message += "- "
-        message += str(results[x])
-        message += " ("
-        message += str((results[x] / numberOfVotes) * 100)
-        message += "%)`"
-        await bot.send_message(channel, message)
+def generate_random_colour():
+    """Generates a random colour decimal"""
+    letters = "0123456789ABCDEF"
+    colour_string = ""
+    for i in range(6):
+        colour_string += rand.choice(letters)
+    return int(colour_string, 16)
 
-    message = ""
+class Poll:
+    """An instance of this class handles the creation of a poll and monitoring of reactions"""
 
-    message = "Number of voters: " 
-    message += str(len(participants))
-    await bot.send_message(channel, message)
+    @property
+    def time_left(self):
+        """Gets the time left for this instance of the poll (in seconds)"""
+        return (timestamp() / 1000) - self.time_to_stop
 
-    message = "Type '!poll help' to start a new poll."
-    await bot.send_message(channel, message)
+    @property
+    def embed(self):
+        """Constructs a Rich Embed for this poll"""
+        e = discord.Embed(type="rich",
+                          description="This is {}'s poll.".format(self.initiator.mention),
+                          timestamp=datetime.now() + timedelta(seconds=self.time_to_stop),
+                          colour=generate_random_colour())
 
-    votingActive = False 
-    question = ""
-    duration = ""
-    options = ""
-    results = []
-    participants = []
-    
-@bot.command()
-async def poll(*, arg=None):
-    """Start a new poll. Usage: !poll -Question -durationInSeconds -Option -Option -Option..."""
-    
-    global votingActive
-    global question
-    global duration
-    global options
-    global results
-    global participants
+        e.add_field(name="\u200b", value="**Options**", inline=False)
+        for i, option in enumerate(self.options):
+            current_votes = len(self.results[ALPHABET[i]])
+            e.add_field(name="{}. {}".format(ALPHABET[i].upper(), option), value="{} votes".format(current_votes), inline=True)
 
-    if not votingActive:
-        
-        arg = arg.split("-")
+        e.set_author(name=self.question,
+                     icon_url=self.initiator.avatar_url)
+        if self.time_left > 0:
+            e.set_footer(text="Time remaining: {} seconds".format(self.time_left))
 
-        question = arg[1]
-        duration = arg[2]
-        durationFloat = float(duration)
+        return e
 
-        if durationFloat < 86400:
-            votingActive = True
+    def __init__(self, question, options, duration, owner, message=None):
+        self.question = question
+        self.question_message = None
+        self.options = options
+        self.duration = duration
+        self.time_to_stop = (timestamp() / 1000) + duration
+        self.initiator = owner
+        self.results = {}
+        for i in range(len(self.options)):
+            self.results[ALPHABET[i]] = []
 
-            bot.loop.create_task(stopPoll(durationFloat))
+        # If a 'message' object already exists, use that
+        if isinstance(message, discord.Message):
+            self.channel = message.channel
+            self.question_message = message
 
-            arg.pop(0)
-            arg.pop(0)
-            arg.pop(0)
-
-            options = []
-
-            alphabet = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
-
-            for x in range(0, len(arg)):
-                option = alphabet[x]
-                option += ": "
-                option += arg[x]
-                options.append(option)
-                results.append(0)
-
-            print(results)
-
-            prompt = "New poll started! It will close in "
-            prompt += duration
-            prompt += " seconds."
-            prompt += " Use '!vote A' etc. to enter your vote."
-            await bot.say(prompt)
-            prompt = "`"
-            prompt += question
-            prompt += "`"
-            
-            await bot.say(prompt)
-
-            for x in options:
-                opt = "`"
-                opt += x
-                opt += "`"
-                await bot.say(opt)
+        # If not, create a new message in 'Poll.start()'
+        elif isinstance(message, discord.Channel):
+            self.channel = message
         else:
-            await bot.say("Poll cannot last longer than one day (86400 seconds).")
+            raise TypeError("The \{message\} argument must be of type 'Discord.Message' or 'Discord.Channel'")
 
-    else:
-        await bot.say("A poll is already active. Use !vote to participate and see how long is left.")
+    async def start(self):
+        """Starts the poll and creates a task for the poll to end using by the duration"""
+        # Send a new message if one wasn't already passed to the constructor
+        if self.question_message is None:
+            self.question_message = await BOT.send_message(self.channel, embed=self.embed)
+        BOT.ongoing_polls[self.question_message.id] = self
 
+        await self.add_reactions()
+        BOT.loop.create_task(self.stop())
 
-@bot.command(pass_context=True)
-async def vote(ctx, *arg):
-    """Use '!vote A' to vote for an option in the current poll. Use '!vote' to see the question."""
-    if votingActive:
-        if not arg:
-            prompt = "`Current poll: "
-            prompt += question
-            prompt += "`"
-            prompt += " Poll closes in "
-            prompt += duration
-            prompt += " seconds. Use !vote A etc to enter your vote."
-            await bot.say(prompt)
+    async def stop(self):
+        """Stops the poll and posts the results"""
 
-            for x in options:
-                opt = "`"
-                opt += x
-                opt += "`"
-                await bot.say(opt)
+        await BOT.wait_until_ready()
+        await asyncio.sleep(self.duration)
 
-        else:
-            if ctx.message.author not in participants:
-                arg = arg[0]
-                arg = arg.upper()
-                alphabet = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
+        # TODO: finalise data to prettify output
 
-                if arg not in alphabet:
-                    await bot.say("Invalid option.")
-                else:
-                    results[alphabet.index(arg)] += 1
-                    participants.append(ctx.message.author)
-                    await bot.say("Vote registered!")
-            else:
-                prompt = ctx.message.author.mention
-                prompt += " you have already voted."
-                await bot.say(prompt)
-    else:
-        await bot.say("No poll active. Use '!poll help' to start a poll.")
+        await BOT.send_message(self.channel, "**{}**'s poll has finished. Here are the results.".format(self.initiator.name), embed=self.embed)
+        BOT.ongoing_polls.pop(self.question_message.id, self)
 
+    async def add_reactions(self):
+        """Adds the respective reactions for each option for users to react to"""
+        for i in range(len(self.options)):
+            await BOT.add_reaction(self.question_message, resolve_emoji_from_alphabet(ALPHABET[i].lower()))
 
-@bot.command(pass_context=True)
-async def weather(ctx, *arg):
+@BOT.command()
+async def weather(*arg):
     """Get current weather conditions at a specified location from Yahoo. E.g '!weather glasgow'"""
-    weather = Weather(unit=Unit.CELSIUS)
+    weather_object = Weather(unit=Unit.CELSIUS)
     degree_sign = u'\N{DEGREE SIGN}'
 
     # Default to glasgow if no argument passed
@@ -400,33 +382,21 @@ async def weather(ctx, *arg):
     else:
         city = arg[0]
 
-    location = weather.lookup_by_location(city)
+    location = weather_object.lookup_by_location(city)
 
-    conditions = ""
-    conditions += location.title
-    conditions += " - "
-    conditions += location.condition.text
-    conditions += " - "
-    conditions += location.condition.temp
-    conditions += degree_sign
-    conditions += location.units.temperature
-    conditions += " - " 
-    conditions += "Humidity: "
-    conditions += location.atmosphere['humidity']
-    conditions += "%"
-    conditions += " - "
-    conditions += "Wind: "
-    conditions += location.wind.speed
-    conditions += " "
-    conditions += location.units.speed
+    embed = discord.Embed(type="rich", colour=generate_random_colour(), timestamp=datetime.now())
+    embed.set_author(name=location.title)
+    embed.add_field(name="Temperature", value="{}{}{}".format(location.condition.temp, degree_sign, location.units.temperature))
+    embed.add_field(name="Condition", value=location.condition.text)
+    embed.add_field(name="Humidity", value="{}%".format(location.atmosphere["humidity"]))
+    embed.add_field(name="Wind", value="{} {}".format(location.wind.speed, location.units.speed))
 
-    await bot.say(conditions)
+    await BOT.say(embed=embed)
 
-
-@bot.command(pass_context=True)
-async def forecast(ctx, *arg):
+@BOT.command()
+async def forecast(*arg):
     """Get the forecast for the next 5 days for a specified location from Yahoo. E.g '!forecast glasgow'"""
-    weather = Weather(unit=Unit.CELSIUS)
+    weather_object = Weather(unit=Unit.CELSIUS)
     degree_sign = u'\N{DEGREE SIGN}'
 
     # Default to glasgow if no argument passed
@@ -435,31 +405,18 @@ async def forecast(ctx, *arg):
     else:
         city = arg[0]
 
-    location = weather.lookup_by_location(city)
-    await bot.say("5 Day Forecast for: " + location.title)
-
+    location = weather_object.lookup_by_location(city)
     forecasts = location.forecast
     count = 0
-    for forecast in forecasts:
+    embed = discord.Embed(type="rich", colour=generate_random_colour(), timestamp=datetime.now())
+    embed.set_author(name="5-day forecast for {}".format(location.title))
+
+    for cast in forecasts:
         if count > 4:
             break
-        forecastOutput = ""
-        forecastOutput += forecast.date
-        forecastOutput += " - "
-        forecastOutput += forecast.text
-        forecastOutput += " - "
-        forecastOutput += "High: " + forecast.high + degree_sign + location.units.temperature
-        forecastOutput += " - Low: "
-        forecastOutput += forecast.low + degree_sign + location.units.temperature
         count += 1
-        await bot.say(forecastOutput)
+        embed.add_field(name=cast.date, value="{}\nHigh: {}{}{}\nLow: {}{}{}".format(cast.text, cast.high, degree_sign, location.units.temperature, cast.low, degree_sign, location.units.temperature))
 
+    await BOT.say(embed=embed)
 
-
-"""
-@bot.command(pass_context=True)
-async def test(ctx):
-    await bot.send_message(ctx.message.author, 'test')
-"""
-
-bot.run(token)
+BOT.run(BOT_TOKEN)
