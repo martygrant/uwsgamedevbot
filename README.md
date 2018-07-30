@@ -36,6 +36,7 @@ If you have any questions for making a contribution, or a code related question 
 * Post an "Unlimited Power" Palaptine meme when anyone mentions the word "power" - currently disabled.
 * !weather - current weather conditions for a specified location.
 * !forecast - 5 day weather forecast for a specified location.
+* !poll - Start a question with options users can vote on.
   
 ## Changelog
 * 0.2 - in development.
@@ -46,6 +47,7 @@ If you have any questions for making a contribution, or a code related question 
   * Palpatine "power" meme.
   * !weather - current weather conditions for a specified location.
   * !forecast - 5 day weather forecast for a specified location.
+  * !poll - Start a question with options users can vote on.
 * 0.1
   * Automatic new member welcome message.
   * !say - Make Bjarne repeat a message.
