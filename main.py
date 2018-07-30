@@ -1,6 +1,6 @@
 """Discord bot for the UWS Game Dev Society, originally developed by Martin Grant"""
 ##### Created 28/02/2018
-##### Last Update 25/07/2018
+##### Last Update 30/07/2018
 ##### Version 0.1
 ##### Contributors
 #
@@ -167,7 +167,7 @@ async def random(*arg):
 @BOT.command()
 async def dice():
     """Roll a dice."""
-    await BOT.say(rand.randint(0, 6))
+    await BOT.say(rand.randint(1, 6))
 
 @BOT.command()
 async def math(*, arg):
