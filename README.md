@@ -39,7 +39,9 @@ If you have any questions for making a contribution, or a code related question 
 * !poll - Start a question with options users can vote on.
   
 ## Changelog
-* 0.2 - in development.
+* 0.3 - in development.
+  *
+* 0.2
   * !random - Random number generator.
   * !dice - Roll a 6 sided dice.
   * !math - some basic math functions.
