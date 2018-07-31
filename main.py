@@ -244,8 +244,12 @@ async def quote(ctx, *arg):
     user = user.lower()
 
     async for message in BOT.logs_from(channel, limit=2000):
-        if message.author.nick.lower() == user:
-            messages.append(message.content)
+        if channel.is_private == False:
+            if message.author.display_name.lower() == user:
+                messages.append(message.content)
+        else:
+            if message.author.nick.lower() == user:
+                messages.append(message.content)
 
     # Pick a random message and output it
     random_message = messages[rand.randint(0, len(messages))]
