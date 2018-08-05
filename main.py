@@ -108,17 +108,14 @@ class OngoingPolls(SavableDict):
 
     async def reinitialise(self):
         """Re-instantiates the polls saved to file"""
-        print("re-initialising polls")
         decoded = {}
         with open(self._dest) as file:
             decoded = json.loads(file.read())
 
         for key, val in decoded.items():
-            print(val["question"])
             if val["timestamp"] + val["duration"] <= timestamp():
                 continue
 
-            print("  restoring...")
             restored_poll = await Poll.restore(val)
             if restored_poll is not None:
                 self[key] = restored_poll
@@ -335,11 +332,9 @@ async def on_member_remove(member):
 @BOT.event
 async def on_message_delete(message):
     """The 'on_message_deleted' event"""
-    print("deleted message")
     if message.id not in BOT.ongoing_polls:
         return
 
-    print("deleting poll")
     deleted_poll = BOT.ongoing_polls[message.id]
     deleted_poll.destroy()
 
