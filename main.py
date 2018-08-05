@@ -252,14 +252,19 @@ class Poll:
 
     async def stop(self):
         """Stops the poll and posts the results"""
-
         await BOT.wait_until_ready()
         await asyncio.sleep(self.duration)
+
+        if self.destroyed:
+            return
 
         # TODO: finalise data to prettify output
 
         await BOT.send_message(self.channel, "**{}**'s poll has finished. Here are the results.".format(self.initiator.name), embed=self.embed)
         BOT.ongoing_polls.pop(self.question_message.id, self)
+
+    def destroy(self):
+        self.destroyed = True
 
     async def add_reactions(self):
         """Adds the respective reactions for each option for users to react to"""
@@ -326,6 +331,19 @@ async def on_member_remove(member):
     BOT.config.refresh()
 
     await BOT.send_message(BOT.config["channels"]["lobby"], "User **{}** has left the server. Goodbye!".format(str(member)))
+
+@BOT.event
+async def on_message_delete(message):
+    """The 'on_message_deleted' event"""
+    print("deleted message")
+    if message.id not in BOT.ongoing_polls:
+        return
+
+    print("deleting poll")
+    deleted_poll = BOT.ongoing_polls[message.id]
+    deleted_poll.destroy()
+
+    await BOT.send_message(deleted_poll.initiator, "Your poll with the question `{}` in {} was deleted. Here are the results.".format(deleted_poll.question, deleted_poll.channel.mention), embed=deleted_poll.embed)
 
 @BOT.event
 async def on_reaction_add(reaction, user):
