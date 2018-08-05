@@ -257,7 +257,7 @@ class Poll:
 
         # TODO: finalise data to prettify output
 
-        await BOT.send_message(self.channel, "**{}**'s poll has finished. Here are the results.".format(self.initiator.name), embed=self.embed)
+        await BOT.send_message(self.channel, "**{}**'s poll has finished. Here are the results.".format(self.initiator.mention), embed=self.embed)
         BOT.ongoing_polls.pop(self.question_message.id, self)
 
     def destroy(self):
