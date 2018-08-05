@@ -17,12 +17,3 @@ def generate_random_colour():
     for i in range(6):
         colour_string += rand.choice(letters)
     return int(colour_string, 16)
-
-def refresh_config():
-    """Refreshes the config file and its properties"""
-    config_file = open('config.json', 'r')
-    BOT.config = config_file.read()
-    config_file.close()
-
-    decoder = json.JSONDecoder()
-    BOT.config = decoder.decode(BOT.config)
