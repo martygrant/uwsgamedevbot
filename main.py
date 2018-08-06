@@ -587,6 +587,32 @@ async def forecast(*arg):
 
     await BOT.say(embed=embed)
 
+
+def getOnlineUserCount(users):
+    count = 0
+    for user in users:
+        if str(user.status) == "online" or str(user.status) == "idle" or str(user.status) == "dnd":
+            count += 1
+
+    return count
+
+@BOT.command(pass_context=True)
+async def stats(ctx):
+    """Get server statistics."""
+    server = ctx.message.author.server
+    serverName = server.name
+    numberOfUsers = server.member_count
+    numberOfOnlineUsers = getOnlineUserCount(server.members)
+    createdDate = server.created_at.strftime('%Y-%m-%d')
+
+    embed = discord.Embed(type="rich", colour=utils.generate_random_colour(), timestamp=datetime.now())
+    embed.set_author(name=serverName)
+    embed.add_field(name="Created", value=createdDate)
+    embed.add_field(name="Users Online", value=numberOfOnlineUsers)
+    embed.add_field(name="Users Total", value=numberOfUsers)
+    
+    await BOT.say(embed=embed)
+
 ##### [ BOT LOGIN ] #####
 
 BOT.run(BOT_TOKEN)
