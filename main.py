@@ -694,15 +694,27 @@ async def role(ctx, *arg):
         if role is None:
             return await BOT.say("That role doesn't exist.")
 
-        if role not in ctx.message.author.roles:
-            await BOT.add_roles(ctx.message.author, role)
-            return await BOT.say("{} role has been added to {}.".format(role, ctx.message.author.mention))
+        # we want to skip removing the specified role if we are adding one as we don't want to return/exit until we check if its a year role and deal with auto removals
+        dontRemove = False
 
-        if role in ctx.message.author.roles:
-            await BOT.remove_roles(ctx.message.author, role)
-            return await BOT.say("{} role has been removed from {}.".format(role, ctx.message.author.mention))
+        if role not in user.roles:
+            await BOT.add_roles(user, role)
+            await BOT.say("{} role has been added to {}.".format(role, user.mention))
+            dontRemove = True
 
-    else:
+        if role in user.roles and dontRemove == False:
+            await BOT.remove_roles(user, role)
+            await BOT.say("{} role has been removed from {}.".format(role, user.mention))
+
+        # Auto remove old year role when new one added e.g if user has 2nd Year and adds 3rd Year, remove 2nd Year automatically
+        years = ["1st Year", "2nd Year", "3rd Year", "4th Year"]
+        userRoles = user.roles
+        for r in userRoles:
+            if r.name in years and r.name != role.name:
+                await BOT.remove_roles(user, r)
+                await BOT.say("{} role has been removed from {}.".format(r, user.mention))
+
+    else:   
         await BOT.say("This role requires manual approval from an admin.")
 
 ##### [ BOT LOGIN ] #####
