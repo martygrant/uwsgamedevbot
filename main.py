@@ -1,6 +1,6 @@
 """Discord bot for the UWS Game Dev Society, originally developed by Martin Grant"""
 ##### Created 28/02/2018
-##### Last Update 31/07/2018
+##### Last Update 17/09/2018
 ##### Version 0.2
 ##### Contributors
 #
@@ -20,11 +20,12 @@ from decimal import Decimal
 import discord
 from discord.ext import commands
 from weather import Weather, Unit
+from discord.utils import get
 
 import utilities as utils
 
 REPOSITORY_URL = "https://github.com/martygrant/uwsgamedevbot"
-VERSION_NUMBER = os.getenv('version')
+VERSION_NUMBER = #os.getenv('version')
 BOT_TOKEN = os.getenv('token')
 
 ##### [ CLASSES ] #####
@@ -313,12 +314,17 @@ async def on_member_join(member):
 Please check out {} and set your server nickname to your real name. Visit {} to see what events are coming up! Why not {}?
 Please conduct yourself professionally in public-facing channels like {}. Thanks!
 
-Type '!help' for a list of my commands.""".format("<#{}>".format(BOT.config["channels"]["rules"]), "<#{}>".format(BOT.config["channels"]["announcements"]), "<#{}>".format(BOT.config["channels"]["introductions"]), "<#{}>".format(BOT.config["channels"]["lobby"]))
+Type '!help' for a list of my commands.
+
+Use !role 1st Year to add a role to your account. Use !roles to see what roles are available. Please change your roles in {}."
+
+""".format("<#{}>".format(BOT.config["channels"]["rules"]), "<#{}>".format(BOT.config["channels"]["announcements"]), "<#{}>".format(BOT.config["channels"]["introductions"]), "<#{}>".format(BOT.config["channels"]["lobby"]), "<#{}>".format(BOT.config["channels"]["role-assignment"]))
 
     # Send the welcome message to the user individually
     await BOT.send_message(member, welcome_message)
     # Announce a new member joining in the lobby channel
     await BOT.send_message(BOT.config["channels"]["lobby"], "Welcome {} to the UWS Game Dev Society!".format(member.mention))
+    await BOT.send_message("Use !role 1st Year to add a role to your account. Use !roles to see what roles are available. Please change your roles in {}.".format("<#{}>".format(BOT.config["channels"]["role-assignment"]))
 
 @BOT.event
 async def on_member_remove(member):
@@ -626,6 +632,63 @@ async def stats(ctx):
     embed.add_field(name="Newest Member", value=newestMember)
     
     await BOT.say(embed=embed)
+
+
+@BOT.command(pass_context=True)
+async def test(ctx):
+    str = ""
+    for x in ctx.message.author.roles:
+        str += x.name 
+        str += " "
+
+
+    await BOT.say(str)
+
+
+@BOT.command(pass_context=True)
+async def roles(ctx):
+    """Print a list of all server roles."""
+    str = ""
+    for role in ctx.message.author.server.roles:
+        str += "`"
+        str += role.name
+        str += "`"
+        str += "\t"
+
+    await BOT.say(str)
+
+
+@BOT.command(pass_context=True)
+async def role(ctx, *arg):
+    """Add or remove a role, e.g !role 1st Year to add or remove the role "1st Year".
+    Must specify the role exactly, e.g "1st Year" and not "1st year".
+    """
+    user = ctx.message.author
+    roleToAdd = ""
+    for x in arg:
+        roleToAdd += str(x)
+        roleToAdd += " "
+    roleToAdd = roleToAdd[:-1]
+
+    disallowedRoles = ["Vice President", "Course Representative", "@everyone", "Committee,", "Robot Overlord", "President", "Member", "Admin", "Lecturer", "Social Secretary"]
+
+    if roleToAdd not in disallowedRoles:
+
+        role = get(user.server.roles, name=roleToAdd)
+
+        if role is None:
+            return await BOT.say("That role doesn't exist.")
+
+        if role not in ctx.message.author.roles:
+            await BOT.add_roles(ctx.message.author, role)
+            return await BOT.say("{} role has been added to {}.".format(role, ctx.message.author.mention))
+
+        if role in ctx.message.author.roles:
+            await BOT.remove_roles(ctx.message.author, role)
+            return await BOT.say("{} role has been removed from {}.".format(role, ctx.message.author.mention))
+
+    else:
+        await BOT.say("This role requires manual approval from an admin.")
 
 ##### [ BOT LOGIN ] #####
 
