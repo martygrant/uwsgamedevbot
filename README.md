@@ -37,10 +37,13 @@ If you have any questions for making a contribution, or a code related question 
 * !weather - current weather conditions for a specified location.
 * !forecast - 5 day weather forecast for a specified location.
 * !poll - Start a question with options users can vote on.
+* !role - Users can add non-functional roles to their own accounts, e.g. "2nd Year" or "Graduate".
+* !roles - Display a list of roles users can add to their accounts.
   
 ## Changelog
 * 0.3 - in development.
-  *
+  * !role - Users can add non-functional roles to their own accounts, e.g. "2nd Year" or "Graduate".
+  * !roles - Display a list of roles users can add to their accounts.
 * 0.2
   * !random - Random number generator.
   * !dice - Roll a 6 sided dice.
