@@ -635,17 +635,6 @@ async def stats(ctx):
 
 
 @BOT.command(pass_context=True)
-async def test(ctx):
-    str = ""
-    for x in ctx.message.author.roles:
-        str += x.name 
-        str += " "
-
-
-    await BOT.say(str)
-
-
-@BOT.command(pass_context=True)
 async def roles(ctx):
     """Print a list of all server roles."""
     str = ""
