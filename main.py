@@ -70,7 +70,8 @@ class Config(SavableDict):
                 "lobby": self["channels"]["lobby"],
                 "rules": self["channels"]["rules"],
                 "announcements": self["channels"]["announcements"],
-                "introductions": self["channels"]["introductions"]
+                "introductions": self["channels"]["introductions"],
+                "role-assignment": self["channels"]["role-assignment"]
             }
         }
 
