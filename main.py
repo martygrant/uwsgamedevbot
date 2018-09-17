@@ -324,7 +324,7 @@ Use !role 1st Year to add a role to your account. Use !roles to see what roles a
     await BOT.send_message(member, welcome_message)
     # Announce a new member joining in the lobby channel
     await BOT.send_message(BOT.config["channels"]["lobby"], "Welcome {} to the UWS Game Dev Society!".format(member.mention))
-    await BOT.send_message("Use !role 1st Year to add a role to your account. Use !roles to see what roles are available. Please change your roles in {}.".format("<#{}>".format(BOT.config["channels"]["role-assignment"]))
+    await BOT.send_message("Use !role 1st Year to add a role to your account. Use !roles to see what roles are available. Please change your roles in {}.".format("<#{}>".format(BOT.config["channels"]["role-assignment"])))
 
 @BOT.event
 async def on_member_remove(member):
