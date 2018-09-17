@@ -116,7 +116,7 @@ class OngoingPolls(SavableDict):
         target_dict = {}
 
         for key, value in self.items():
-            if not str(key).startswith('_'):
+            if not str(key).startswith('_') and isinstance(value, Poll):
                 target_dict[key] = value.raw_dict
 
         return target_dict
@@ -276,7 +276,8 @@ class Poll:
         # TODO: finalise data to prettify output
 
         await BOT.send_message(self.channel, "**{}**'s poll has finished. Here are the results.".format(self.initiator.mention), embed=self.embed)
-        BOT.ongoing_polls.pop(self.question_message.id, self)
+        # BOT.ongoing_polls.pop(self.question_message.id, self)
+        del BOT.ongoing_polls[self.question_message.id]
 
     def destroy(self):
         self.destroyed = True
@@ -539,6 +540,9 @@ async def quote(ctx, *arg):
 async def poll(ctx):
     """Starts a new poll. Usage: !poll -Question -durationInSeconds -Option -Option -Option..."""
     args = ctx.message.content.split("-")
+    if len(args) < 2:
+        return await BOT.say("Please see the command usage for this command: `{}poll -Question -durationInSeconds -Option -Option -Option...`".format(BOT.command_prefix))
+
     question = args[1]
     duration = args[2]
 
