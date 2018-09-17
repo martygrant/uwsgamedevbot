@@ -25,7 +25,7 @@ from discord.utils import get
 import utilities as utils
 
 REPOSITORY_URL = "https://github.com/martygrant/uwsgamedevbot"
-VERSION_NUMBER = #os.getenv('version')
+VERSION_NUMBER = os.getenv('version')
 BOT_TOKEN = os.getenv('token')
 
 ##### [ CLASSES ] #####
