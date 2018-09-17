@@ -334,7 +334,7 @@ Please conduct yourself professionally in public-facing channels like {}. Thanks
 
 Type `!help` for a list of my commands.
 
-Use `!role <role name>` to add a role to your account. Use `!roles` to see what roles are available. Please change your roles in {}."
+Use `!role <role name>` to add a role to your account. Use `!roles` to see what roles are available. This must be done in the {} channel.
 
 """.format("<#{}>".format(BOT.config["channels"]["rules"]), "<#{}>".format(BOT.config["channels"]["announcements"]), "<#{}>".format(BOT.config["channels"]["introductions"]), "<#{}>".format(BOT.config["channels"]["lobby"]), "<#{}>".format(BOT.config["channels"]["role-assignment"]))
 
