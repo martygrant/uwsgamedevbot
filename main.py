@@ -635,17 +635,38 @@ async def stats(ctx):
     await BOT.say(embed=embed)
 
 
+disallowedRoles = ["Vice President", "Course Representative", "@everyone", "Committee", "Robot Overlord", "President", "Member", "Admin", "Lecturer", "Social Secretary"]
+
 @BOT.command(pass_context=True)
 async def roles(ctx):
     """Print a list of all server roles."""
-    str = ""
-    for role in ctx.message.author.server.roles:
-        str += "`"
-        str += role.name
-        str += "`"
-        str += "\t"
+    roleString = ""
+    count = 0
 
-    await BOT.say(str)
+    rolesList = []
+
+    for role in ctx.message.author.server.roles:
+        # Only display roles that aren't in the disallowed list (Admin etc.)
+        if role.name not in disallowedRoles:
+
+            rolesList.append(role.name)
+
+    rolesList = sorted(rolesList)
+
+    for role in rolesList:
+        roleString += "`"
+        roleString += role
+        roleString += "`"
+        roleString += "\n"
+        count += 1
+
+        if count > 4:
+            count = 0
+
+    embed = discord.Embed(type="rich", colour=utils.generate_random_colour())
+    embed.add_field(name="Roles", value=roleString)
+
+    await BOT.say(embed=embed)
 
 
 @BOT.command(pass_context=True)
@@ -660,11 +681,15 @@ async def role(ctx, *arg):
         roleToAdd += " "
     roleToAdd = roleToAdd[:-1]
 
-    disallowedRoles = ["Vice President", "Course Representative", "@everyone", "Committee,", "Robot Overlord", "President", "Member", "Admin", "Lecturer", "Social Secretary"]
-
     if roleToAdd not in disallowedRoles:
+        role = None
 
-        role = get(user.server.roles, name=roleToAdd)
+        # compare role argument with server roles by checking their lower-case representations
+        for tempRole in ctx.message.author.server.roles:
+            if tempRole.name.lower() == roleToAdd.lower():
+                print("MATCH! " + tempRole.name + " " + roleToAdd)
+                role = tempRole
+                break
 
         if role is None:
             return await BOT.say("That role doesn't exist.")
