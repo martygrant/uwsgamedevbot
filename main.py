@@ -9,6 +9,7 @@
 #####
 
 import os
+from pathlib import Path
 import random as rand
 import sys
 from datetime import datetime, timedelta
@@ -47,6 +48,21 @@ class SavableDict(dict):
         super().__init__(kwarg)
         self._dest = destination
 
+        # Create a file handle for this file
+        this_dict = {}
+        self._file_handle = Path(self._dest)
+
+        # Create this file if it does not exist
+        if not self._file_handle.is_file():
+            self._file_handle.write_text(json.dumps(this_dict))
+
+        # Or load this file and load it into this object
+        else:
+            this_dict = json.loads(self._file_handle.read_text())
+
+        for key, val in this_dict.items():
+            self[key] = val
+
     def __setitem__(self, key, val):
         super().__setitem__(key, val)
         self.save()
@@ -57,8 +73,8 @@ class SavableDict(dict):
 
     def save(self):
         """Saves the dict to file"""
-        with open(self._dest, 'w') as file:
-            file.write(json.dumps(self.raw_dict))
+        encoded_json = json.dumps(self.raw_dict, indent=2)
+        self._file_handle.write_text(encoded_json)
 
 class Config(SavableDict):
     """The config class"""
@@ -85,12 +101,12 @@ class Config(SavableDict):
             new_config = json.loads(file.read())
 
         # Remove any properties that are not part of the new config
-        for key, val in self.raw_dict:
+        for key, val in self.raw_dict.items():
             if key not in new_config:
                 del self[key]
 
         # Overwrite any new properties
-        for key, val in new_config:
+        for key, val in new_config.items():
             self[key] = val
 
 class OngoingPolls(SavableDict):
@@ -310,14 +326,14 @@ async def on_member_join(member):
     # Refresh channel IDs
     BOT.config.refresh()
 
-    welcome_message = """Welcome to the UWS Game Dev Society!
+    welcome_message = """Welcome to the **UWS Game Dev Society**!
 
-Please check out {} and set your server nickname to your real name. Visit {} to see what events are coming up! Why not {}?
+Please check out {} and set your server nickname to your real name. Visit {} to see what events are coming up! Why not introduce yourself in {}?
 Please conduct yourself professionally in public-facing channels like {}. Thanks!
 
-Type '!help' for a list of my commands.
+Type `!help` for a list of my commands.
 
-Use !role 1st Year to add a role to your account. Use !roles to see what roles are available. Please change your roles in {}."
+Use `!role <role name>` to add a role to your account. Use `!roles` to see what roles are available. Please change your roles in {}."
 
 """.format("<#{}>".format(BOT.config["channels"]["rules"]), "<#{}>".format(BOT.config["channels"]["announcements"]), "<#{}>".format(BOT.config["channels"]["introductions"]), "<#{}>".format(BOT.config["channels"]["lobby"]), "<#{}>".format(BOT.config["channels"]["role-assignment"]))
 
@@ -325,7 +341,6 @@ Use !role 1st Year to add a role to your account. Use !roles to see what roles a
     await BOT.send_message(member, welcome_message)
     # Announce a new member joining in the lobby channel
     await BOT.send_message(BOT.config["channels"]["lobby"], "Welcome {} to the UWS Game Dev Society!".format(member.mention))
-    await BOT.send_message("Use !role 1st Year to add a role to your account. Use !roles to see what roles are available. Please change your roles in {}.".format("<#{}>".format(BOT.config["channels"]["role-assignment"])))
 
 @BOT.event
 async def on_member_remove(member):
