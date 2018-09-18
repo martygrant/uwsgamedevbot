@@ -1,6 +1,6 @@
 """Discord bot for the UWS Game Dev Society, originally developed by Martin Grant"""
 ##### Created 28/02/2018
-##### Last Update 17/09/2018
+##### Last Update 18/09/2018
 ##### Version 0.2
 ##### Contributors
 #
@@ -24,6 +24,7 @@ from weather import Weather, Unit
 from discord.utils import get
 
 import utilities as utils
+import modules.roles
 
 REPOSITORY_URL = "https://github.com/martygrant/uwsgamedevbot"
 VERSION_NUMBER = os.getenv('version')
@@ -311,6 +312,7 @@ class CustomBot(commands.Bot):
 ##### [ BOT INSTANTIATION ] #####
 
 BOT = CustomBot(description="Below is a listing for Bjarne's commands. Use '!' infront of any of them to execute a command, like '!help'", command_prefix="!")
+BOT.load_extension('modules.roles')
 
 ##### [ EVENT LISTENERS ] #####
 
@@ -653,88 +655,6 @@ async def stats(ctx):
     
     await BOT.say(embed=embed)
 
-
-disallowedRoles = ["Vice President", "Course Representative", "@everyone", "Committee", "Robot Overlord", "President", "Member", "Admin", "Lecturer", "Social Secretary"]
-
-@BOT.command(pass_context=True)
-async def roles(ctx):
-    """Print a list of all server roles."""
-    roleString = ""
-    count = 0
-
-    rolesList = []
-
-    for role in ctx.message.author.server.roles:
-        # Only display roles that aren't in the disallowed list (Admin etc.)
-        if role.name not in disallowedRoles:
-
-            rolesList.append(role.name)
-
-    rolesList = sorted(rolesList)
-
-    for role in rolesList:
-        roleString += "`"
-        roleString += role
-        roleString += "`"
-        roleString += "\n"
-        count += 1
-
-        if count > 4:
-            count = 0
-
-    embed = discord.Embed(type="rich", colour=utils.generate_random_colour())
-    embed.add_field(name="Roles", value=roleString)
-
-    await BOT.say(embed=embed)
-
-
-@BOT.command(pass_context=True)
-async def role(ctx, *arg):
-    """Add or remove a role, e.g !role 1st Year to add or remove the role "1st Year".
-    Must specify the role exactly, e.g "1st Year" and not "1st year".
-    """
-    user = ctx.message.author
-    roleToAdd = ""
-    for x in arg:
-        roleToAdd += str(x)
-        roleToAdd += " "
-    roleToAdd = roleToAdd[:-1]
-
-    if roleToAdd not in disallowedRoles:
-        role = None
-
-        # compare role argument with server roles by checking their lower-case representations
-        for tempRole in ctx.message.author.server.roles:
-            if tempRole.name.lower() == roleToAdd.lower():
-                print("MATCH! " + tempRole.name + " " + roleToAdd)
-                role = tempRole
-                break
-
-        if role is None:
-            return await BOT.say("That role doesn't exist.")
-
-        # we want to skip removing the specified role if we are adding one as we don't want to return/exit until we check if its a year role and deal with auto removals
-        dontRemove = False
-
-        if role not in user.roles:
-            await BOT.add_roles(user, role)
-            await BOT.say("{} role has been added to {}.".format(role, user.mention))
-            dontRemove = True
-
-        if role in user.roles and dontRemove == False:
-            await BOT.remove_roles(user, role)
-            await BOT.say("{} role has been removed from {}.".format(role, user.mention))
-
-        # Auto remove old year role when new one added e.g if user has 2nd Year and adds 3rd Year, remove 2nd Year automatically
-        years = ["1st Year", "2nd Year", "3rd Year", "4th Year"]
-        userRoles = user.roles
-        for r in userRoles:
-            if r.name in years and r.name != role.name:
-                await BOT.remove_roles(user, r)
-                await BOT.say("{} role has been removed from {}.".format(r, user.mention))
-
-    else:   
-        await BOT.say("This role requires manual approval from an admin.")
 
 ##### [ BOT LOGIN ] #####
 

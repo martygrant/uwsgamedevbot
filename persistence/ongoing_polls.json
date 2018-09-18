@@ -1,16 +1,1 @@
-{
-  "message_id": {
-    "message_id": "",
-    "timestamp": 0,
-    "duration": 0,
-    "question": "",
-    "owner_id": "",
-    "channel_id": "",
-    "results": {
-      "a": {
-        "option_name": "",
-        "votes": []
-      }
-    }
-  }
-}
+{}
