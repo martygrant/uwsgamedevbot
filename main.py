@@ -622,7 +622,7 @@ async def gif(ctx):
     g = safygiphy.Giphy(token=GIPHY_TOKEN)
 
     r = g.search(q=ctx.message.content, rating="pg-13")
-    r = r["data"][random.randint(0,25)]["embed_url"]
+    r = r["data"][rand.randint(0,25)]["embed_url"]
 
     await BOT.say("**EXPERIMENTAL COMMAND**\n" + r)
 
