@@ -591,6 +591,7 @@ def getNewestMember(users):
 
     return newest
 
+
 @BOT.command(pass_context=True)
 async def stats(ctx):
     """Get server statistics."""
@@ -609,7 +610,7 @@ async def stats(ctx):
     embed.add_field(name="Users Online", value=numberOfOnlineUsers)
     embed.add_field(name="Users Total", value=numberOfUsers)
     embed.add_field(name="Newest Member", value=newestMember)
-    
+
     await BOT.say(embed=embed)
 
 

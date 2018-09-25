@@ -1,11 +1,11 @@
 {
   "bot": {
     "channels": {
+      "introductions": "413835267557031937",
       "lobby": "412327350366240768",
-      "rules": "405741154643214356",
       "role-assignment": "491196614346801162",
       "announcements": "405451914973806602",
-      "introductions": "413835267557031937"
+      "rules": "405741154643214356"
     },
     "restricted-roles": [
       "Vice President",

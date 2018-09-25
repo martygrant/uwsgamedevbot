@@ -14,29 +14,40 @@ class Roles:
 		roleString = ""
 		count = 0
 
-		rolesList = []
+		rolesDict = {}
 
 		for role in ctx.message.author.server.roles:
-			# Only display roles that aren't in the restricted list (Admin etc.)
-			if role.name not in self.restrictedRoles:
+			if role.name != "@everyone":
+				rolesDict[role.name] = 0
+		
+		# For each server role, for each user's list of roles, add to a count if there is a user with that role
+		for role in ctx.message.author.server.roles:
+			if role.name != "@everyone":
+				for user in ctx.message.author.server.members:
+					for userRole in user.roles:
+						if role == userRole:
+							rolesDict[role.name] += 1
 
-				rolesList.append(role.name)
+		# Convert dict to list so we can sort alphabetically
+		rolesList = []
+		for k, v in rolesDict.items():
+			rolesString = "`"
+			rolesString += k
+			rolesString += "` "
+			rolesString += str(v)
+			rolesString += "\n"
+			rolesList.append(rolesString)
 
 		rolesList = sorted(rolesList)
 
-		for role in rolesList:
-			roleString += "`"
-			roleString += role
-			roleString += "`"
-			roleString += "\n"
-			count += 1
-
-			if count > 4:
-				count = 0
+		# Covnert list to string so we can display using line terminator \n
+		rolesString = ""
+		for x in rolesList:
+			rolesString += x
 
 		embed = discord.Embed(type="rich", colour=utils.generate_random_colour())
 		embed.set_author(name="Use '!role Role Name' to add a role to your profile.")
-		embed.add_field(name="Roles", value=roleString)
+		embed.add_field(name="Roles", value=rolesString)
 
 		await self.bot.say(embed=embed)
 
