@@ -21,6 +21,7 @@ from decimal import Decimal
 import discord
 from discord.ext import commands
 from discord.utils import get
+import safygiphy
 
 import utilities as utils
 import modules.roles
@@ -29,6 +30,7 @@ import modules.weather
 REPOSITORY_URL = "https://github.com/martygrant/uwsgamedevbot"
 VERSION_NUMBER = os.getenv('version')
 BOT_TOKEN = os.getenv('token')
+GIPHY_TOKEN = os.getenv('giphy')
 
 ##### [ CLASSES ] #####
 
@@ -612,6 +614,17 @@ async def stats(ctx):
     embed.add_field(name="Newest Member", value=newestMember)
 
     await BOT.say(embed=embed)
+
+
+@BOT.command(pass_context=True)
+async def gif(ctx):
+    """Search for gifs from Giphy. Using G MPAA age rating. EXPERIMENTAL"""
+    g = safygiphy.Giphy(token=GIPHY_TOKEN)
+
+    r = g.search(q=ctx.message.content, rating="g")
+    r = r["data"][0]["embed_url"]
+
+    await BOT.say("**EXPERIMENTAL COMMAND**\n" + r)
 
 
 ##### [ BOT LOGIN ] #####
