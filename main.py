@@ -621,7 +621,7 @@ async def gif(ctx):
     """Search for gifs from Giphy. Using G MPAA age rating. EXPERIMENTAL"""
     g = safygiphy.Giphy(token=GIPHY_TOKEN)
 
-    r = g.search(q=ctx.message.content, rating="g")
+    r = g.search(q=ctx.message.content, rating="pg-13")
     r = r["data"][0]["embed_url"]
 
     await BOT.say("**EXPERIMENTAL COMMAND**\n" + r)
