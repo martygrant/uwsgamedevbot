@@ -20,11 +20,11 @@ import asyncio
 from decimal import Decimal
 import discord
 from discord.ext import commands
-from weather import Weather, Unit
 from discord.utils import get
 
 import utilities as utils
 import modules.roles
+import modules.weather
 
 REPOSITORY_URL = "https://github.com/martygrant/uwsgamedevbot"
 VERSION_NUMBER = os.getenv('version')
@@ -83,15 +83,18 @@ class Config(SavableDict):
     def raw_dict(self):
         """Returns a custom representation of this dict"""
         return {
-            "channels": {
-                "lobby": self["channels"]["lobby"],
-                "rules": self["channels"]["rules"],
-                "announcements": self["channels"]["announcements"],
-                "introductions": self["channels"]["introductions"],
-                "role-assignment": self["channels"]["role-assignment"]
+            "bot": {
+                "channels": {
+                    "lobby": self["bot"]["channels"]["lobby"],
+                    "rules": self["bot"]["channels"]["rules"],
+                    "announcements": self["bot"]["channels"]["announcements"],
+                    "introductions": self["bot"]["channels"]["introductions"],
+                    "role-assignment": self["bot"]["channels"]["role-assignment"],
+                },
+                "restricted-roles": self["bot"]["restricted-roles"]
             }
         }
-
+    
     def __init__(self):
         super().__init__("config.json")
 
@@ -313,6 +316,7 @@ class CustomBot(commands.Bot):
 
 BOT = CustomBot(description="Below is a listing for Bjarne's commands. Use '!' infront of any of them to execute a command, like '!help'", command_prefix="!")
 BOT.load_extension('modules.roles')
+BOT.load_extension('modules.weather')
 
 ##### [ EVENT LISTENERS ] #####
 
@@ -338,12 +342,12 @@ Type `!help` for a list of my commands.
 
 Use `!role <role name>` to add a role to your account. Use `!roles` to see what roles are available. This must be done in the {} channel.
 
-""".format("<#{}>".format(BOT.config["channels"]["rules"]), "<#{}>".format(BOT.config["channels"]["announcements"]), "<#{}>".format(BOT.config["channels"]["introductions"]), "<#{}>".format(BOT.config["channels"]["lobby"]), "<#{}>".format(BOT.config["channels"]["role-assignment"]))
+""".format("<#{}>".format(BOT.config["bot"]["channels"]["rules"]), "<#{}>".format(BOT.config["bot"]["channels"]["announcements"]), "<#{}>".format(BOT.config["bot"]["channels"]["introductions"]), "<#{}>".format(BOT.config["bot"]["channels"]["lobby"]), "<#{}>".format(BOT.config["bot"]["channels"]["role-assignment"]))
 
     # Send the welcome message to the user individually
     await BOT.send_message(member, welcome_message)
     # Announce a new member joining in the lobby channel
-    await BOT.send_message(BOT.config["channels"]["lobby"], "Welcome {} to the UWS Game Dev Society!".format(member.mention))
+    await BOT.send_message(BOT.config["bot"]["channels"]["lobby"], "Welcome {} to the UWS Game Dev Society!".format(member.mention))
 
 @BOT.event
 async def on_member_remove(member):
@@ -566,54 +570,7 @@ async def poll(ctx):
     new_poll = Poll(question, options, timestamp(), duration_float, ctx.message.author, ctx.message.channel)
     await new_poll.start()
 
-@BOT.command()
-async def weather(*arg):
-    """Get current weather conditions at a specified location from Yahoo. E.g '!weather glasgow'"""
-    weather_object = Weather(unit=Unit.CELSIUS)
-    degree_sign = u'\N{DEGREE SIGN}'
 
-    # Default to glasgow if no argument passed
-    if not arg:
-        city = 'glasgow'
-    else:
-        city = arg[0]
-
-    location = weather_object.lookup_by_location(city)
-
-    embed = discord.Embed(type="rich", colour=utils.generate_random_colour(), timestamp=datetime.now())
-    embed.set_author(name=location.title)
-    embed.add_field(name="Temperature", value="{}{}{}".format(location.condition.temp, degree_sign, location.units.temperature))
-    embed.add_field(name="Condition", value=location.condition.text)
-    embed.add_field(name="Humidity", value="{}%".format(location.atmosphere["humidity"]))
-    embed.add_field(name="Wind", value="{} {}".format(location.wind.speed, location.units.speed))
-
-    await BOT.say(embed=embed)
-
-@BOT.command()
-async def forecast(*arg):
-    """Get the forecast for the next 5 days for a specified location from Yahoo. E.g '!forecast glasgow'"""
-    weather_object = Weather(unit=Unit.CELSIUS)
-    degree_sign = u'\N{DEGREE SIGN}'
-
-    # Default to glasgow if no argument passed
-    if not arg:
-        city = 'glasgow'
-    else:
-        city = arg[0]
-
-    location = weather_object.lookup_by_location(city)
-    forecasts = location.forecast
-    count = 0
-    embed = discord.Embed(type="rich", colour=utils.generate_random_colour(), timestamp=datetime.now())
-    embed.set_author(name="5-day forecast for {}".format(location.title))
-
-    for cast in forecasts:
-        if count > 4:
-            break
-        count += 1
-        embed.add_field(name=cast.date, value="{}\nHigh: {}{}{}\nLow: {}{}{}".format(cast.text, cast.high, degree_sign, location.units.temperature, cast.low, degree_sign, location.units.temperature))
-
-    await BOT.say(embed=embed)
 
 
 def getOnlineUserCount(users):

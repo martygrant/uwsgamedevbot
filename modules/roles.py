@@ -6,8 +6,7 @@ import utilities as utils
 class Roles:
 	def __init__(self, bot):
 		self.bot = bot
-		# put this in config file
-		self.disallowedRoles = ["Vice President", "Course Representative", "@everyone", "Committee", "Robot Overlord", "President", "Member", "Admin", "Lecturer", "Social Secretary"]
+		self.restrictedRoles = bot.config["bot"]["restricted-roles"]
 
 	@commands.command(pass_context=True)
 	async def roles(self, ctx):
@@ -18,8 +17,8 @@ class Roles:
 		rolesList = []
 
 		for role in ctx.message.author.server.roles:
-			# Only display roles that aren't in the disallowed list (Admin etc.)
-			if role.name not in self.disallowedRoles:
+			# Only display roles that aren't in the restricted list (Admin etc.)
+			if role.name not in self.restrictedRoles:
 
 				rolesList.append(role.name)
 
@@ -54,7 +53,7 @@ class Roles:
 			roleToAdd += " "
 		roleToAdd = roleToAdd[:-1]
 
-		if roleToAdd not in self.disallowedRoles:
+		if roleToAdd not in self.restrictedRoles:
 			role = None
 
 			# compare role argument with server roles by checking their lower-case representations
