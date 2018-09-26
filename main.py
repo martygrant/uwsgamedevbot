@@ -22,6 +22,7 @@ import discord
 from discord.ext import commands
 from discord.utils import get
 import safygiphy
+import requests
 
 import utilities as utils
 import modules.roles
@@ -626,6 +627,35 @@ async def gif(ctx):
 
     await BOT.say("**EXPERIMENTAL COMMAND**\n" + r)
 
+
+@BOT.command(pass_context=True)
+async def urban(ctx):
+    """Search for a definition from Urban Dictionary."""
+
+    query = ctx.message.content
+    query = query.replace('!urban ', '')
+
+    defineURL = 'https://api.urbandictionary.com/v0/define?term='
+
+    response = requests.get(defineURL + query)
+    data = response.json()
+
+    firstEntry = data["list"][0]
+
+    definition = firstEntry["definition"]
+    example = firstEntry["example"]
+    url = firstEntry["permalink"]
+
+    title = "Urban Dictionary: "
+    title += query
+
+    embed = discord.Embed(type="rich", colour=utils.generate_random_colour(), timestamp=datetime.now())
+    embed.set_author(name=title)
+    embed.add_field(name="Definition", value=definition)
+    embed.add_field(name="Example", value=example)
+    embed.add_field(name="URL", value=url)
+    
+    await BOT.say(embed=embed)
 
 ##### [ BOT LOGIN ] #####
 

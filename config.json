@@ -1,5 +1,12 @@
 {
   "bot": {
+    "channels": {
+      "rules": "405741154643214356",
+      "role-assignment": "491196614346801162",
+      "introductions": "413835267557031937",
+      "announcements": "405451914973806602",
+      "lobby": "412327350366240768"
+    },
     "restricted-roles": [
       "Vice President",
       "Course Representative",
@@ -11,13 +18,6 @@
       "Admin",
       "Lecturer",
       "Social Secretary"
-    ],
-    "channels": {
-      "introductions": "413835267557031937",
-      "announcements": "405451914973806602",
-      "rules": "405741154643214356",
-      "lobby": "412327350366240768",
-      "role-assignment": "491196614346801162"
-    }
+    ]
   }
 }
