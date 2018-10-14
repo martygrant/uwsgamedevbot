@@ -44,7 +44,9 @@ If you have any questions for making a contribution, or a code related question 
 * !report - Anonymously report user to society committee.
   
 ## Changelog
-* 0.3 - in development.
+* 0.4 - in development.
+  *
+* 0.3
   * !role - Users can add non-functional roles to their own accounts, e.g. "2nd Year" or "Graduate".
   * !roles - Display a list of roles users can add to their accounts.
   * !urban - Search for an Urban Dictionary definition.
