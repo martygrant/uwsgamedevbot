@@ -30,7 +30,6 @@ import modules.weather
 REPOSITORY_URL = "https://github.com/martygrant/uwsgamedevbot"
 VERSION_NUMBER = os.getenv('version')
 BOT_TOKEN = os.getenv('token')
-GIPHY_TOKEN = os.getenv('giphy')
 
 ##### [ CLASSES ] #####
 
@@ -92,6 +91,7 @@ class Config(SavableDict):
                     "announcements": self["bot"]["channels"]["announcements"],
                     "introductions": self["bot"]["channels"]["introductions"],
                     "role-assignment": self["bot"]["channels"]["role-assignment"],
+                    "bjarne": self["bot"]["channels"]["bjarne"],
                 },
                 "restricted-roles": self["bot"]["restricted-roles"]
             }
@@ -426,6 +426,15 @@ async def bjarnequote():
         'An organisation that treats its programmers as morons will soon have programmers that are willing and able to act like morons only.',
         'Anybody who comes to you and says he has a perfect language is either naïve or a salesman.',
         'C makes it easy to shoot yourself in the foot; C++ makes it harder, but when you do it blows your whole leg off.',
+        'The standard library saves programmers from having to reinvent the wheel.',
+        'Certainly not every good program is object-oriented, and not every object-oriented program is good.',
+        'Clearly, I reject the view that there is one way that is right for everyone and for every problem.',
+        'Thus, the standard library will serve as both a tool and as a teacher.',
+        'There are only two kinds of languages: the ones people complain about and the ones nobody uses.',
+        'I have always wished for my computer to be as easy to use as my telephone; my wish has come true because I can no longer figure out how to use my telephone.',
+        'If you think it\'s simple, then you have misunderstood the problem.',
+        'C++ is designed to allow you to express ideas, but if you don\'t have ideas or don\'t have any clue about how to express them, C++ doesn\'t offer much help.',
+        'Programming is like sex: It may give some concrete results, but that is not why we do it.',
     ]
     await BOT.say(rand.choice(quotes) + " - Bjarne Stroustrup.")
 
@@ -458,6 +467,7 @@ async def dice():
     """Roll a dice."""
     await BOT.say(rand.randint(1, 6))
 
+# todo: use arguments, should make this command much simpler
 @BOT.command()
 async def math(*, arg):
     """Perform math operations, e.g '10 + 20'
@@ -617,11 +627,8 @@ async def stats(ctx):
 
 
 @BOT.command(pass_context=True)
-async def urban(ctx):
+async def urban(ctx, query):
     """Search for a definition from Urban Dictionary."""
-
-    query = ctx.message.content
-    query = query.replace('!urban ', '')
 
     defineURL = 'https://api.urbandictionary.com/v0/define?term='
 
@@ -645,6 +652,21 @@ async def urban(ctx):
     
     await BOT.say(embed=embed)
 
+"""
+@BOT.command(pass_context=True)
+async def report(ctx, user):
+    BOT.config["bot"]["channels"]["bjarne"]
+
+    reason = ctx.message.content
+    reason = reason.replace("!report " + user, "")
+    reason = reason[1:]
+
+    message = "A user has made a report against another user.\nThis is against: "
+    message += "`" + user + "` for the reason: `"
+    message += reason + "`."
+
+    await BOT.send_message(BOT.config["bot"]["channels"]["bjarne"], message)
+"""
 ##### [ BOT LOGIN ] #####
 
 BOT.run(BOT_TOKEN)
