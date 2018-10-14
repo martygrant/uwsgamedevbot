@@ -41,12 +41,14 @@ If you have any questions for making a contribution, or a code related question 
 * !role - Users can add non-functional roles to their own accounts, e.g. "2nd Year" or "Graduate".
 * !roles - Display a list of roles users can add to their accounts.
 * !urban - Search for an Urban Dictionary definition.
+* !report - Anonymously report user to society committee.
   
 ## Changelog
 * 0.3 - in development.
   * !role - Users can add non-functional roles to their own accounts, e.g. "2nd Year" or "Graduate".
   * !roles - Display a list of roles users can add to their accounts.
   * !urban - Search for an Urban Dictionary definition.
+  * !report - Anonymously report user to society committee.
 * 0.2
   * !random - Random number generator.
   * !dice - Roll a 6 sided dice.
