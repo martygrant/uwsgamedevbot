@@ -315,6 +315,9 @@ class CustomBot(commands.Bot):
             return super().send_message(self.get_channel(destination), content, tts=tts, embed=embed)
         return super().send_message(destination, content, tts=tts, embed=embed)
 
+    lastBjarneChoice = -1
+    last8BallChoice = -1
+
 ##### [ BOT INSTANTIATION ] #####
 
 BOT = CustomBot(description="Below is a listing for Bjarne's commands. Use '!' infront of any of them to execute a command, like '!help'", command_prefix="!")
@@ -419,6 +422,7 @@ async def version():
     """Display Bjarne version info."""
     await BOT.say("v{} - {}".format(VERSION_NUMBER, REPOSITORY_URL))
 
+
 @BOT.command()
 async def bjarnequote():
     """Get a quote from Bjarne Stroustrup, creator of C++."""
@@ -437,7 +441,16 @@ async def bjarnequote():
         'C++ is designed to allow you to express ideas, but if you don\'t have ideas or don\'t have any clue about how to express them, C++ doesn\'t offer much help.',
         'Programming is like sex: It may give some concrete results, but that is not why we do it.',
     ]
-    await BOT.say(rand.choice(quotes) + " - Bjarne Stroustrup.")
+
+    choice = rand.choice(quotes)
+    
+    # so we don't get the same quote twice in a row
+    while choice == BOT.lastBjarneChoice:
+        choice = rand.choice(quotes)
+    
+    BOT.lastBjarneChoice = choice
+
+    await BOT.say(choice)
 
 @BOT.command()
 async def random(*arg):
@@ -668,6 +681,46 @@ async def report(ctx, user):
     message += reason + "`."
 
     await BOT.send_message(BOT.config["bot"]["channels"]["committee"], message)
+
+
+@BOT.command(pass_context=True)
+async def eightball(ctx, *arg):
+    """Let the magic 8 ball provide you with wisdom."""
+    if arg:
+        options = [
+            "It is certain.",
+            "It is decidedly so.",
+            "Without a doubt.",
+            "Yes - definitely.",
+            "You may rely on it.",
+            "As I see it, yes.",
+            "Most likely.",
+            "Outlook good.",
+            "Yes.",
+            "Signs point to yes.",
+            "Reply hazy, try again",
+            "Ask again later.",
+            "Better not tell you now.",
+            "Cannot predict now.",
+            "Concentrate and ask again.",
+            "Don't count on it.",
+            "My reply is no.",
+            "My sources say no.",
+            "Outlook not so good.",
+            "Very doubtful."
+        ]
+
+        choice = rand.choice(options)
+        
+        # so we don't get the same quote twice in a row
+        while choice == BOT.last8BallChoice:
+            choice = rand.choice(options)
+        
+        BOT.last8BallChoice = choice
+
+        await BOT.say(choice)
+    else:
+        await BOT.say("You must ask a question!")
 
 ##### [ BOT LOGIN ] #####
 
