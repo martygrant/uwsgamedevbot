@@ -92,6 +92,7 @@ class Config(SavableDict):
                     "introductions": self["bot"]["channels"]["introductions"],
                     "role-assignment": self["bot"]["channels"]["role-assignment"],
                     "bjarne": self["bot"]["channels"]["bjarne"],
+                    "committee": self["bot"]["channels"]["committee"],
                 },
                 "restricted-roles": self["bot"]["restricted-roles"]
             }
@@ -652,7 +653,7 @@ async def urban(ctx, query):
     
     await BOT.say(embed=embed)
 
-"""
+
 @BOT.command(pass_context=True)
 async def report(ctx, user):
     BOT.config["bot"]["channels"]["bjarne"]
@@ -665,8 +666,8 @@ async def report(ctx, user):
     message += "`" + user + "` for the reason: `"
     message += reason + "`."
 
-    await BOT.send_message(BOT.config["bot"]["channels"]["bjarne"], message)
-"""
+    await BOT.send_message(BOT.config["bot"]["channels"]["committee"], message)
+
 ##### [ BOT LOGIN ] #####
 
 BOT.run(BOT_TOKEN)
