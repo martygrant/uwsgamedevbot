@@ -21,6 +21,7 @@ If you have any questions for making a contribution, or a code related question 
 * Python 3.4.2+
 * [discord.py](https://github.com/Rapptz/discord.py)
 * [weather-api](https://pypi.org/project/weather-api/)
+* [requests](https://pypi.org/project/requests/)
 
 ### Contributors
 * [Medallyon](https://github.com/Medallyon)
