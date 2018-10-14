@@ -21,7 +21,6 @@ from decimal import Decimal
 import discord
 from discord.ext import commands
 from discord.utils import get
-import safygiphy
 import requests
 
 import utilities as utils
@@ -615,17 +614,6 @@ async def stats(ctx):
     embed.add_field(name="Newest Member", value=newestMember)
 
     await BOT.say(embed=embed)
-
-
-@BOT.command(pass_context=True)
-async def gif(ctx):
-    """Search for gifs from Giphy. Using G MPAA age rating. EXPERIMENTAL"""
-    g = safygiphy.Giphy(token=GIPHY_TOKEN)
-
-    r = g.search(q=ctx.message.content, rating="pg-13")
-    r = r["data"][rand.randint(0,25)]["embed_url"]
-
-    await BOT.say("**EXPERIMENTAL COMMAND**\n" + r)
 
 
 @BOT.command(pass_context=True)
