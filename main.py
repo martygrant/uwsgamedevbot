@@ -656,6 +656,7 @@ async def urban(ctx, query):
 
 @BOT.command(pass_context=True)
 async def report(ctx, user):
+    """Report a user anonymously to the society committee. Usage: !report <user> <reason>"""
     BOT.config["bot"]["channels"]["bjarne"]
 
     reason = ctx.message.content
