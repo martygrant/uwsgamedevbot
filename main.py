@@ -27,10 +27,11 @@ import wikipedia
 import utilities as utils
 import modules.roles
 import modules.weather
+import modules.hangman
 
 REPOSITORY_URL = "https://github.com/martygrant/uwsgamedevbot"
 VERSION_NUMBER = os.getenv('version')
-BOT_TOKEN = os.getenv('token')
+BOT_TOKEN = "Mzg5MTI0MDU4OTQ5ODc3NzYx.DqaI6g.W3Lom7QO4ImPyysttFZ0_fk9TSQ"
 GIPHY_TOKEN = os.getenv('giphy')
 
 ##### [ CLASSES ] #####
@@ -324,6 +325,7 @@ class CustomBot(commands.Bot):
 BOT = CustomBot(description="Below is a listing for Bjarne's commands. Use '!' infront of any of them to execute a command, like '!help'", command_prefix="!")
 BOT.load_extension('modules.roles')
 BOT.load_extension('modules.weather')
+BOT.load_extension('modules.hangman')
 
 ##### [ EVENT LISTENERS ] #####
 
@@ -423,6 +425,9 @@ async def on_message(message):
         await BOT.send_message(message.channel, "lmao")
     if message.content == "rip":
         await BOT.send_message(message.channel, "press F to pay respects\nF")
+
+    if message.channel.id in BOT.hangman_games and len(message.content) == 1:
+        await BOT.hangman_games[message.channel.id].process_message(message)
 
     await BOT.process_commands(message)
 
