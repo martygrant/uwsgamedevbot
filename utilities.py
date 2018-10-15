@@ -1,15 +1,14 @@
 """This file contains some utility functions"""
-
 import random as rand
 
 ALPHABET = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q',
             'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
 def resolve_emoji_from_alphabet(letter):
-    """Returns the emoji representation of a letter"""
+    """Returns the unicode emoji representation of a lowercase letter"""
     return chr(ord(letter) + 127365)
 
 def resolve_letter_from_emoji(emoji):
-    """Returns the character representation of a letter emoji (in lowercase)"""
+    """Returns the lowercase character representation of a letter emoji"""
     return chr(ord(emoji) - 127365)
 
 def generate_random_colour():

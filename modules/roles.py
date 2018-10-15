@@ -1,106 +1,150 @@
+"""This module implements the role command"""
+
+import asyncio
 import discord
 from discord.ext import commands
 import utilities as utils
 
+ROLE_CATEGORIES = {
+    "Course Levels": [
+        "1st Year",
+        "2nd Year",
+        "3rd Year",
+        "4th Year",
+        "PhD Student",
+        "Graduate"
+    ],
+    "Courses": [
+        "Computer Animation Arts",
+        "Computer Games (Art and Animation)",
+        "Computer Games Development",
+        "Computer Games Technology",
+        "Computer Science",
+        "Digital Art & Design",
+        "Ecology",
+        "Information Technology",
+        "Web and Mobile Development"
+    ],
+    "Institutions": [
+        "Abertay University",
+        "Glasgow Caledonian University",
+        "Strathclyde University",
+        "University of the West of Scotland",
+        "West College Scotland"
+    ],
+    "Others": [
+        "Bjarne Development",
+        "HNC",
+        "HND"
+    ]
+}
 
 class Roles:
-	def __init__(self, bot):
-		self.bot = bot
-		self.restrictedRoles = bot.config["bot"]["restricted-roles"]
+    """The `Role` class that declares methods to add users to specified roles"""
+    def __init__(self, bot):
+        self.bot = bot
+        self.restricted_roles = bot.config["bot"]["restricted-roles"]
 
-	@commands.command(pass_context=True)
-	async def roles(self, ctx):
-		"""Print a list of all server roles."""
-		roleString = ""
-		count = 0
+    @commands.command(pass_context=True)
+    async def roles(self, ctx):
+        """Display a `MessageEmbed` with available Reactions that add respective roles to the user"""
+        category = await self.collect_category(ctx)
+        roles_to_add = await self.collect_roles(category["category"], category["message"], ctx)
 
-		rolesDict = {}
+        roles_added = list(set(roles_to_add) - set(ctx.message.author.roles))
+        print(list(map(lambda r: r.name, roles_added)))
+        await self.bot.add_roles(ctx.message.author, *roles_to_add)
 
-		for role in ctx.message.author.server.roles:
-			if role.name != "@everyone":
-				rolesDict[role.name] = 0
-		
-		# For each server role, for each user's list of roles, add to a count if there is a user with that role
-		for role in ctx.message.author.server.roles:
-			if role.name != "@everyone":
-				for user in ctx.message.author.server.members:
-					for userRole in user.roles:
-						if role == userRole:
-							rolesDict[role.name] += 1
+        result_embed = discord.Embed(type="rich", colour=utils.generate_random_colour())
+        result_embed.set_author(name="Added {} Roles".format(len(roles_added)))
+        if roles_added:
+            result_embed.add_field(name="You have been granted the following roles:", value="`{}`".format("`, `".join(list(map(lambda r: r.name, roles_to_add)))))
+        else:
+            result_embed.description = "You were not applicable for or already have some of the roles you picked."
 
-		# Convert dict to list so we can sort alphabetically
-		rolesList = []
-		for k, v in rolesDict.items():
-			rolesString = "`"
-			rolesString += k
-			rolesString += "` "
-			rolesString += str(v)
-			rolesString += "\n"
-			rolesList.append(rolesString)
+        await self.bot.clear_reactions(category["message"])
+        await self.bot.edit_message(category["message"], embed=result_embed)
 
-		rolesList = sorted(rolesList)
+    async def collect_category(self, ctx):
+        """Presents an Embed and finds the category from the Reaction the user provided"""
+        embed = discord.Embed(type="rich", colour=utils.generate_random_colour())
+        embed.set_author(name="Role Categories")
+        embed.description = "Click on an emoji at the bottom of this panel that corresponds with the category of roles you want to assign yourself. Another panel will pop up that will ask you for the specific roles."
 
-		# Covnert list to string so we can display using line terminator \n
-		rolesString = ""
-		for x in rolesList:
-			rolesString += x
+        current_emoji_index = 0
+        for cat, roles_array in ROLE_CATEGORIES.items():
+            embed.add_field(name="{} {}".format(utils.resolve_emoji_from_alphabet(utils.ALPHABET[current_emoji_index]), cat), value="`{}`".format("`,\n`".join(roles_array)))
+            current_emoji_index += 1
 
-		embed = discord.Embed(type="rich", colour=utils.generate_random_colour())
-		embed.set_author(name="Use '!role Role Name' to add a role to your profile.")
-		embed.add_field(name="Roles", value=rolesString)
+        reaction_message = await self.bot.send_message(ctx.message.channel, embed=embed)
+        for i, cat in enumerate(list(ROLE_CATEGORIES)):
+            await self.bot.add_reaction(reaction_message, utils.resolve_emoji_from_alphabet(utils.ALPHABET[i]))
 
-		await self.bot.say(embed=embed)
+        def filter(reaction, user):
+            if user.id != ctx.message.author.id:
+                return False
 
+            letter = utils.resolve_letter_from_emoji(reaction.emoji)
+            for i in range(0, len(ROLE_CATEGORIES)):
+                if letter == utils.ALPHABET[i]:
+                    return True
 
-	@commands.command(pass_context=True)
-	async def role(self, ctx, *arg):
-		"""Add or remove a role, e.g !role 1st Year to add or remove the role "1st Year".
-		Must specify the role exactly, e.g "1st Year" and not "1st year".
-		"""
-		user = ctx.message.author
-		roleToAdd = ""
-		for x in arg:
-			roleToAdd += str(x)
-			roleToAdd += " "
-		roleToAdd = roleToAdd[:-1]
+            return False
 
-		if roleToAdd not in self.restrictedRoles:
-			role = None
+        res = await self.bot.wait_for_reaction(message=reaction_message, check=filter, timeout=60)
 
-			# compare role argument with server roles by checking their lower-case representations
-			for tempRole in ctx.message.author.server.roles:
-				if tempRole.name.lower() == roleToAdd.lower():
-					print("MATCH! " + tempRole.name + " " + roleToAdd)
-					role = tempRole
-					break
+        index = utils.ALPHABET.index(utils.resolve_letter_from_emoji(res.reaction.emoji))
+        return {
+            "category": list(ROLE_CATEGORIES)[index],
+            "message": reaction_message
+        }
 
-			if role is None:
-				return await self.bot.say("That role doesn't exist.")
+    async def collect_roles(self, category, reaction_message, ctx):
+        """Presents another Embed and gives the user the roles they selected"""
+        embed = discord.Embed(type="rich", colour=utils.generate_random_colour())
+        embed.set_author(name="Select roles from {}".format(category))
+        embed.description = "Click on the emojis at the bottom of this panel that correspond with the roles you want added to your profile. The panel will close itself in 30 seconds, allowing you to select as many roles as you want."
+        embed.set_footer(text="You have 30 seconds to choose your roles")
 
-			# we want to skip removing the specified role if we are adding one as we don't want to return/exit until we check if its a year role and deal with auto removals
-			dontRemove = False
+        roles_list = []
+        for i, r in enumerate(ROLE_CATEGORIES[category]):
+            roles_list.append("{} {}".format(utils.resolve_emoji_from_alphabet(utils.ALPHABET[i]), r))
 
-			if role not in user.roles:
-				await self.bot.add_roles(user, role)
-				await self.bot.say("{} role has been added to {}.".format(role, user.mention))
-				dontRemove = True
+        embed.add_field(name="Available Roles", value="\n".join(roles_list))
 
-			if role in user.roles and dontRemove == False:
-				await self.bot.remove_roles(user, role)
-				await self.bot.say("{} role has been removed from {}.".format(role, user.mention))
+        await self.bot.clear_reactions(reaction_message)
+        await self.bot.edit_message(reaction_message, embed=embed)
 
-			# Auto remove old year role when new one added e.g if user has 2nd Year and adds 3rd Year, remove 2nd Year automatically
-			years = ["1st Year", "2nd Year", "3rd Year", "4th Year"]
-			if role.name in years:
-				userRoles = user.roles
-				for r in userRoles:
-					if r.name in years and r.name != role.name:
-						await self.bot.remove_roles(user, r)
-						await self.bot.say("{} role has been removed from {}.".format(r, user.mention))
+        for i, r in enumerate(ROLE_CATEGORIES[category]):
+            await self.bot.add_reaction(reaction_message, utils.resolve_emoji_from_alphabet(utils.ALPHABET[i]))
 
-		else:   
-			await self.bot.say("This role requires manual approval from an admin.")
+        await self.bot.wait_until_ready()
+        await asyncio.sleep(30)
+
+        # Update the message that collects the reactions so we can access `.reactions`
+        reaction_message = await self.bot.get_message(reaction_message.channel, reaction_message.id)
+
+        selected_emojis = reaction_message.reactions.copy()
+        reaction_users = []
+        for i, reaction in enumerate(reaction_message.reactions):
+            reaction_users.append(await self.bot.get_reaction_users(reaction))
+
+        for i, reaction in enumerate(reaction_message.reactions):
+            id_list = list(map(lambda x: x.id, reaction_users[i]))
+
+            if ctx.message.author.id not in id_list:
+                selected_emojis.remove(reaction)
+
+        roles_selected = list(map(lambda r: utils.ALPHABET.index(utils.resolve_letter_from_emoji(r.emoji)), selected_emojis))
+        roles_to_add = list(map(lambda i: ROLE_CATEGORIES[category][i], roles_selected))
+        for i, role_string in enumerate(roles_to_add):
+            roles_to_add[i] = next((r for r in ctx.message.server.roles if r.name == role_string), None)
+
+        # Remove all potential `None` from the list
+        roles_to_add = [x for x in roles_to_add if x is not None]
+        return roles_to_add
 
 def setup(bot):
-	bot.add_cog(Roles(bot))
-	print("Roles module loaded.")
+    """Method that loads this module into the client"""
+    bot.add_cog(Roles(bot))
+    print("Roles module loaded.")
