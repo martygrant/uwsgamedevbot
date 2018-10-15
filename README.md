@@ -22,6 +22,7 @@ If you have any questions for making a contribution, or a code related question 
 * [discord.py](https://github.com/Rapptz/discord.py)
 * [weather-api](https://pypi.org/project/weather-api/)
 * [requests](https://pypi.org/project/requests/)
+* [wikipedia](https://github.com/goldsmith/Wikipedia)
 
 ### Contributors
 * [Medallyon](https://github.com/Medallyon)
@@ -45,7 +46,9 @@ If you have any questions for making a contribution, or a code related question 
   
 ## Changelog
 * 0.4 - in development.
-  *
+  * !xckd - Get a random XCKD comic.
+  * !eightball - Get some classic 8-ball wisdom.
+  * !wiki - Get the first few sentences of a Wikipedia page.
 * 0.3
   * !role - Users can add non-functional roles to their own accounts, e.g. "2nd Year" or "Graduate".
   * !roles - Display a list of roles users can add to their accounts.
