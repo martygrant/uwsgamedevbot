@@ -31,6 +31,7 @@ import modules.weather
 REPOSITORY_URL = "https://github.com/martygrant/uwsgamedevbot"
 VERSION_NUMBER = os.getenv('version')
 BOT_TOKEN = os.getenv('token')
+GIPHY_TOKEN = os.getenv('giphy')
 
 ##### [ CLASSES ] #####
 
@@ -379,7 +380,8 @@ async def on_message_delete(message):
 @BOT.event
 async def on_reaction_add(reaction, user):
     """The 'on_reaction_add' event"""
-    if reaction.message.id not in BOT.ongoing_polls or user.id == BOT.user.id:
+
+    if user.id == BOT.user.id or reaction.message.id not in BOT.ongoing_polls:
         return
 
     current_poll = BOT.ongoing_polls[reaction.message.id]
