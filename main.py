@@ -95,8 +95,7 @@ class Config(SavableDict):
                     "role-assignment": self["bot"]["channels"]["role-assignment"],
                     "bjarne": self["bot"]["channels"]["bjarne"],
                     "committee": self["bot"]["channels"]["committee"],
-                },
-                "restricted-roles": self["bot"]["restricted-roles"]
+                }
             }
         }
     

@@ -8,18 +8,6 @@
       "role-assignment": "491196614346801162",
       "bjarne": "413882124249071618",
       "committee": "416255534438547456"
-    },
-    "restricted-roles": [
-      "Vice President",
-      "Course Representative",
-      "@everyone",
-      "Committee",
-      "Robot Overlord",
-      "President",
-      "Member",
-      "Admin",
-      "Lecturer",
-      "Social Secretary"
-    ]
+    }
   }
 }
