@@ -22,6 +22,7 @@ import discord
 from discord.ext import commands
 from discord.utils import get
 import requests
+import wikipedia
 
 import utilities as utils
 import modules.roles
@@ -750,6 +751,28 @@ async def xkcd(ctx):
 
     comic = data["img"]
     await BOT.say(comic)
+
+
+@BOT.command(pass_context=True)
+async def wiki(ctx):
+    """Get the first few sentences of a Wikipedia page."""
+
+    query = ctx.message.content
+    query = query.replace('!wiki', '')
+
+    summary = wikipedia.summary(query, auto_suggest=True, sentences=2)
+    page = wikipedia.page(query, auto_suggest=True)
+
+    title = "Wikipedia: "
+    title += page.title
+    URL = page.url
+
+    embed = discord.Embed(type="rich", colour=utils.generate_random_colour(), timestamp=datetime.now())
+    embed.set_author(name=title)
+    embed.add_field(name="Summary", value=summary)
+    embed.add_field(name="Read More", value=URL)
+    
+    await BOT.say(embed=embed)
 
 ##### [ BOT LOGIN ] #####
 
