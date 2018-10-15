@@ -79,7 +79,7 @@ class Roles:
         for i, cat in enumerate(list(ROLE_CATEGORIES)):
             await self.bot.add_reaction(reaction_message, utils.resolve_emoji_from_alphabet(utils.ALPHABET[i]))
 
-        def filter(reaction, user):
+        def check(reaction, user):
             if user.id != ctx.message.author.id:
                 return False
 
@@ -90,7 +90,7 @@ class Roles:
 
             return False
 
-        res = await self.bot.wait_for_reaction(message=reaction_message, check=filter, timeout=60)
+        res = await self.bot.wait_for_reaction(message=reaction_message, check=check, timeout=30)
 
         index = utils.ALPHABET.index(utils.resolve_letter_from_emoji(res.reaction.emoji))
         return {
@@ -145,7 +145,7 @@ class Roles:
 
                 return False
 
-            res = await self.bot.wait_for_reaction(message=reaction_message, check=check, timeout=60)
+            res = await self.bot.wait_for_reaction(message=reaction_message, check=check, timeout=30)
 
             index = utils.ALPHABET.index(utils.resolve_letter_from_emoji(res.reaction.emoji))
             role_to_add = ROLE_CATEGORIES[list(ROLE_CATEGORIES)[0]][index]
