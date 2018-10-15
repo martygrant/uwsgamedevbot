@@ -21,8 +21,8 @@ from decimal import Decimal
 import discord
 from discord.ext import commands
 from discord.utils import get
-import safygiphy
 import requests
+import wikipedia
 
 import utilities as utils
 import modules.roles
@@ -30,8 +30,7 @@ import modules.weather
 
 REPOSITORY_URL = "https://github.com/martygrant/uwsgamedevbot"
 VERSION_NUMBER = os.getenv('version')
-# BOT_TOKEN = os.getenv('token')
-BOT_TOKEN = "Mzg5MTI0MDU4OTQ5ODc3NzYx.DqUdeA.CnulIyc23XRMWbVBL3hB_S8xpp8"
+BOT_TOKEN = os.getenv('token')
 GIPHY_TOKEN = os.getenv('giphy')
 
 ##### [ CLASSES ] #####
@@ -94,6 +93,8 @@ class Config(SavableDict):
                     "announcements": self["bot"]["channels"]["announcements"],
                     "introductions": self["bot"]["channels"]["introductions"],
                     "role-assignment": self["bot"]["channels"]["role-assignment"],
+                    "bjarne": self["bot"]["channels"]["bjarne"],
+                    "committee": self["bot"]["channels"]["committee"],
                 },
                 "restricted-roles": self["bot"]["restricted-roles"]
             }
@@ -316,6 +317,9 @@ class CustomBot(commands.Bot):
             return super().send_message(self.get_channel(destination), content, tts=tts, embed=embed)
         return super().send_message(destination, content, tts=tts, embed=embed)
 
+    lastBjarneChoice = -1
+    last8BallChoice = -1
+
 ##### [ BOT INSTANTIATION ] #####
 
 BOT = CustomBot(description="Below is a listing for Bjarne's commands. Use '!' infront of any of them to execute a command, like '!help'", command_prefix="!")
@@ -408,6 +412,21 @@ async def on_reaction_remove(reaction, user):
         # Update the original poll message
         await BOT.edit_message(current_poll.question_message, embed=current_poll.embed)
 
+
+@BOT.event
+async def on_message(message):
+    if "vape" in message.content and message.content != "<:vapenation:423973451716624391>":
+        await BOT.send_message(message.channel, "<:vapenation:423973451716624391>")
+    ussr = ["putin", "soviet", "lenin", "stalin"] 
+    if any(x in message.content for x in ussr) and message.content != "<:soviet:423927402637295617>":
+        await BOT.send_message(message.channel, "<:soviet:423927402637295617>")
+    if "ayy" in message.content:
+        await BOT.send_message(message.channel, "lmao")
+    if message.content == "rip":
+        await BOT.send_message(message.channel, "press F to pay respects\nF")
+
+    await BOT.process_commands(message)
+
 ##### [ BOT COMMANDS ] #####
 
 @BOT.command()
@@ -421,6 +440,7 @@ async def version():
     """Display Bjarne version info."""
     await BOT.say("v{} - {}".format(VERSION_NUMBER, REPOSITORY_URL))
 
+
 @BOT.command()
 async def bjarnequote():
     """Get a quote from Bjarne Stroustrup, creator of C++."""
@@ -429,8 +449,26 @@ async def bjarnequote():
         'An organisation that treats its programmers as morons will soon have programmers that are willing and able to act like morons only.',
         'Anybody who comes to you and says he has a perfect language is either naïve or a salesman.',
         'C makes it easy to shoot yourself in the foot; C++ makes it harder, but when you do it blows your whole leg off.',
+        'The standard library saves programmers from having to reinvent the wheel.',
+        'Certainly not every good program is object-oriented, and not every object-oriented program is good.',
+        'Clearly, I reject the view that there is one way that is right for everyone and for every problem.',
+        'Thus, the standard library will serve as both a tool and as a teacher.',
+        'There are only two kinds of languages: the ones people complain about and the ones nobody uses.',
+        'I have always wished for my computer to be as easy to use as my telephone; my wish has come true because I can no longer figure out how to use my telephone.',
+        'If you think it\'s simple, then you have misunderstood the problem.',
+        'C++ is designed to allow you to express ideas, but if you don\'t have ideas or don\'t have any clue about how to express them, C++ doesn\'t offer much help.',
+        'Programming is like sex: It may give some concrete results, but that is not why we do it.',
     ]
-    await BOT.say(rand.choice(quotes) + " - Bjarne Stroustrup.")
+
+    choice = rand.choice(quotes)
+    
+    # so we don't get the same quote twice in a row
+    while choice == BOT.lastBjarneChoice:
+        choice = rand.choice(quotes)
+    
+    BOT.lastBjarneChoice = choice
+
+    await BOT.say(choice)
 
 @BOT.command()
 async def random(*arg):
@@ -461,6 +499,7 @@ async def dice():
     """Roll a dice."""
     await BOT.say(rand.randint(1, 6))
 
+# todo: use arguments, should make this command much simpler
 @BOT.command()
 async def math(*, arg):
     """Perform math operations, e.g '10 + 20'
@@ -620,22 +659,8 @@ async def stats(ctx):
 
 
 @BOT.command(pass_context=True)
-async def gif(ctx):
-    """Search for gifs from Giphy. Using G MPAA age rating. EXPERIMENTAL"""
-    g = safygiphy.Giphy(token=GIPHY_TOKEN)
-
-    r = g.search(q=ctx.message.content, rating="pg-13")
-    r = r["data"][rand.randint(0,25)]["embed_url"]
-
-    await BOT.say("**EXPERIMENTAL COMMAND**\n" + r)
-
-
-@BOT.command(pass_context=True)
-async def urban(ctx):
+async def urban(ctx, query):
     """Search for a definition from Urban Dictionary."""
-
-    query = ctx.message.content
-    query = query.replace('!urban ', '')
 
     defineURL = 'https://api.urbandictionary.com/v0/define?term='
 
@@ -656,6 +681,98 @@ async def urban(ctx):
     embed.add_field(name="Definition", value=definition)
     embed.add_field(name="Example", value=example)
     embed.add_field(name="URL", value=url)
+    
+    await BOT.say(embed=embed)
+
+
+@BOT.command(pass_context=True)
+async def report(ctx, user):
+    """Report a user anonymously to the society committee. Usage: !report <user> <reason>"""
+    BOT.config["bot"]["channels"]["bjarne"]
+
+    reason = ctx.message.content
+    reason = reason.replace("!report " + user, "")
+    reason = reason[1:]
+
+    message = "A user has made a report against another user.\nThis is against: "
+    message += "`" + user + "` for the reason: `"
+    message += reason + "`."
+
+    await BOT.send_message(BOT.config["bot"]["channels"]["committee"], message)
+
+
+@BOT.command(pass_context=True)
+async def eightball(ctx, *arg):
+    """Let the magic 8 ball provide you with wisdom."""
+    if arg:
+        options = [
+            "It is certain. :+1:",
+            "It is decidedly so. :+1:",
+            "Without a doubt. :+1:",
+            "Yes - definitely. :+1:",
+            "You may rely on it. :+1:",
+            "As I see it, yes. :+1:",
+            "Most likely. :+1:",
+            "Outlook good. :+1:",
+            "Yes. :+1:",
+            "Signs point to yes. :+1:",
+            "Reply hazy, try again. :shrug:",
+            "Ask again later. :shrug:",
+            "Better not tell you now. :shrug:",
+            "Cannot predict now. :shrug:",
+            "Concentrate and ask again. :shrug:",
+            "Don't count on it. :shrug:",
+            "My reply is no. :-1:",
+            "My sources say no. :-1:",
+            "Outlook not so good. :-1:",
+            "Very doubtful. :-1:"
+        ]
+
+        choice = rand.choice(options)
+        
+        # so we don't get the same quote twice in a row
+        while choice == BOT.last8BallChoice:
+            choice = rand.choice(options)
+        
+        BOT.last8BallChoice = choice
+
+        await BOT.say(choice)
+    else:
+        await BOT.say("You must ask a question!")
+
+
+@BOT.command(pass_context=True)
+async def xkcd(ctx):
+    """Get a random XKCD comic."""
+
+    choice = rand.randint(0, 2058)
+    url = 'http://xkcd.com/' + str(choice) + '/info.0.json'
+
+    response = requests.get(url)
+    data = response.json()
+
+    comic = data["img"]
+    await BOT.say(comic)
+
+
+@BOT.command(pass_context=True)
+async def wiki(ctx):
+    """Get the first few sentences of a Wikipedia page."""
+
+    query = ctx.message.content
+    query = query.replace('!wiki', '')
+
+    summary = wikipedia.summary(query, auto_suggest=True, sentences=2)
+    page = wikipedia.page(query, auto_suggest=True)
+
+    title = "Wikipedia: "
+    title += page.title
+    URL = page.url
+
+    embed = discord.Embed(type="rich", colour=utils.generate_random_colour(), timestamp=datetime.now())
+    embed.set_author(name=title)
+    embed.add_field(name="Summary", value=summary)
+    embed.add_field(name="Read More", value=URL)
     
     await BOT.say(embed=embed)
 

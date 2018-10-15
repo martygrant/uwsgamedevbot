@@ -1,3 +1,4 @@
 discord.py
 weather-api
-safygiphy
+requests
+wikipedia
