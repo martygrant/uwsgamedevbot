@@ -409,6 +409,21 @@ async def on_reaction_remove(reaction, user):
         # Update the original poll message
         await BOT.edit_message(current_poll.question_message, embed=current_poll.embed)
 
+
+@BOT.event
+async def on_message(message):
+    if "vape" in message.content and message.content != "<:vapenation:423973451716624391>":
+        await BOT.send_message(message.channel, "<:vapenation:423973451716624391>")
+    ussr = ["putin", "soviet", "lenin", "stalin"] 
+    if any(x in message.content for x in ussr) and message.content != "<:soviet:423927402637295617>":
+        await BOT.send_message(message.channel, "<:soviet:423927402637295617>")
+    if "ayy" in message.content:
+        await BOT.send_message(message.channel, "lmao")
+    if message.content == "rip":
+        await BOT.send_message(message.channel, "press F to pay respects\nF")
+
+    await BOT.process_commands(message)
+
 ##### [ BOT COMMANDS ] #####
 
 @BOT.command()
@@ -688,26 +703,26 @@ async def eightball(ctx, *arg):
     """Let the magic 8 ball provide you with wisdom."""
     if arg:
         options = [
-            "It is certain.",
-            "It is decidedly so.",
-            "Without a doubt.",
-            "Yes - definitely.",
-            "You may rely on it.",
-            "As I see it, yes.",
-            "Most likely.",
-            "Outlook good.",
-            "Yes.",
-            "Signs point to yes.",
-            "Reply hazy, try again",
-            "Ask again later.",
-            "Better not tell you now.",
-            "Cannot predict now.",
-            "Concentrate and ask again.",
-            "Don't count on it.",
-            "My reply is no.",
-            "My sources say no.",
-            "Outlook not so good.",
-            "Very doubtful."
+            "It is certain. :+1:",
+            "It is decidedly so. :+1:",
+            "Without a doubt. :+1:",
+            "Yes - definitely. :+1:",
+            "You may rely on it. :+1:",
+            "As I see it, yes. :+1:",
+            "Most likely. :+1:",
+            "Outlook good. :+1:",
+            "Yes. :+1:",
+            "Signs point to yes. :+1:",
+            "Reply hazy, try again. :shrug:",
+            "Ask again later. :shrug:",
+            "Better not tell you now. :shrug:",
+            "Cannot predict now. :shrug:",
+            "Concentrate and ask again. :shrug:",
+            "Don't count on it. :shrug:",
+            "My reply is no. :-1:",
+            "My sources say no. :-1:",
+            "Outlook not so good. :-1:",
+            "Very doubtful. :-1:"
         ]
 
         choice = rand.choice(options)
@@ -721,6 +736,20 @@ async def eightball(ctx, *arg):
         await BOT.say(choice)
     else:
         await BOT.say("You must ask a question!")
+
+
+@BOT.command(pass_context=True)
+async def xkcd(ctx):
+    """Get a random XKCD comic."""
+
+    choice = rand.randint(0, 2058)
+    url = 'http://xkcd.com/' + str(choice) + '/info.0.json'
+
+    response = requests.get(url)
+    data = response.json()
+
+    comic = data["img"]
+    await BOT.say(comic)
 
 ##### [ BOT LOGIN ] #####
 
