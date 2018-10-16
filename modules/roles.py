@@ -43,7 +43,6 @@ class Roles:
     """The `Role` class that declares methods to add users to specified roles"""
     def __init__(self, bot):
         self.bot = bot
-        self.restricted_roles = bot.config["bot"]["restricted-roles"]
 
     @commands.command(pass_context=True)
     async def roles(self, ctx):
