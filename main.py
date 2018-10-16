@@ -31,7 +31,7 @@ import modules.hangman
 
 REPOSITORY_URL = "https://github.com/martygrant/uwsgamedevbot"
 VERSION_NUMBER = os.getenv('version')
-BOT_TOKEN = "Mzg5MTI0MDU4OTQ5ODc3NzYx.DqaI6g.W3Lom7QO4ImPyysttFZ0_fk9TSQ"
+BOT_TOKEN = os.getenv('token')
 GIPHY_TOKEN = os.getenv('giphy')
 
 ##### [ CLASSES ] #####
