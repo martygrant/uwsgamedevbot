@@ -39,16 +39,18 @@ If you have any questions for making a contribution, or a code related question 
 * !weather - current weather conditions for a specified location.
 * !forecast - 5 day weather forecast for a specified location.
 * !poll - Start a question with options users can vote on.
-* !role - Users can add non-functional roles to their own accounts, e.g. "2nd Year" or "Graduate".
 * !roles - Display a list of roles users can add to their accounts.
 * !urban - Search for an Urban Dictionary definition.
 * !report - Anonymously report user to society committee.
+* !hangman - Play an interactive game of Hangman.
   
 ## Changelog
 * 0.4 - in development.
   * !xckd - Get a random XCKD comic.
   * !eightball - Get some classic 8-ball wisdom.
   * !wiki - Get the first few sentences of a Wikipedia page.
+  * !roles - Revamp roles command to be more intuitive.
+  * !hangman - Play an interactive game of Hangman.
 * 0.3
   * !roles - Users can add non-functional roles to their own accounts, e.g. "2nd Year" or "Graduate".
   * !urban - Search for an Urban Dictionary definition.
