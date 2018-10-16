@@ -45,7 +45,9 @@ If you have any questions for making a contribution, or a code related question 
 * !hangman - Play an interactive game of Hangman.
   
 ## Changelog
-* 0.4 - in development.
+* 0.5 - in development.
+  *
+* 0.4
   * !xckd - Get a random XCKD comic.
   * !eightball - Get some classic 8-ball wisdom.
   * !wiki - Get the first few sentences of a Wikipedia page.
