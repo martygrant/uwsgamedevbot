@@ -11,8 +11,8 @@ ROLE_CATEGORIES = {
         "2nd Year",
         "3rd Year",
         "4th Year",
-        "PhD Student",
-        "Graduate"
+        "Graduate",
+        "PhD Student"
     ],
     "Courses": [
         "Computer Animation Arts",
@@ -98,13 +98,13 @@ class Roles:
         }
 
     async def handle_years(self, selected_year, member):
-        """Removes the previous year role if existing"""
-        if selected_year.name not in ROLE_CATEGORIES[list(ROLE_CATEGORIES)[0]]:
+        """Removes the previous year role, including graduate, if existing"""
+        year_names = ROLE_CATEGORIES[list(ROLE_CATEGORIES)[0]][:5]
+        if selected_year.name not in year_names:
             return
 
-        previous_role = next((r for r in member.roles if r.id != selected_year.id and r.name in ROLE_CATEGORIES[list(ROLE_CATEGORIES)[0]]), None)
-
-        if previous_role is None:
+        previous_role = next((r for r in member.roles if r.id != selected_year.id and r.name in year_names), None)
+        if not previous_role:
             return
 
         await self.bot.remove_roles(member, previous_role)
