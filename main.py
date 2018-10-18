@@ -413,23 +413,41 @@ async def on_reaction_remove(reaction, user):
         # Update the original poll message
         await BOT.edit_message(current_poll.question_message, embed=current_poll.embed)
 
+DANK_MESSAGE_MAP = [
+    ["ayy", "lmao"],
+    ["rip", "Press F to pay respects\n`F`"],
+    ["vape", "<:vapenation:423973451716624391>"],
+    [["putin", "soviet", "lenin", "stalin"], "<:soviet:423927402637295617>"]
+]
 
 @BOT.event
 async def on_message(message):
-    if "vape" in message.content and message.content != "<:vapenation:423973451716624391>":
-        await BOT.send_message(message.channel, "<:vapenation:423973451716624391>")
-    ussr = ["putin", "soviet", "lenin", "stalin"] 
-    if any(x in message.content for x in ussr) and message.content != "<:soviet:423927402637295617>":
-        await BOT.send_message(message.channel, "<:soviet:423927402637295617>")
-    if "ayy" in message.content:
-        await BOT.send_message(message.channel, "lmao")
-    if message.content == "rip":
-        await BOT.send_message(message.channel, "press F to pay respects\nF")
+    """The 'on_message' event handler"""
 
+    if message.author.id == BOT.user.id:
+        return
+
+    # HANGMAN letter listener
     if message.channel.id in BOT.hangman_games and len(message.content) == 1:
         await BOT.hangman_games[message.channel.id].process_message(message)
 
     await BOT.process_commands(message)
+
+    # dank messages - check per word in message
+    if message.content and message.content[0] != BOT.command_prefix:
+        split_message = message.content.lower().split(' ')
+        for dankness in DANK_MESSAGE_MAP:
+            key = dankness[0]
+            val = dankness[1]
+
+            if isinstance(key, list):
+                if any(x in split_message for x in key):
+                    await BOT.send_message(message.channel, val)
+                    break
+            else:
+                if key in split_message:
+                    await BOT.send_message(message.channel, val)
+                    break
 
 ##### [ BOT COMMANDS ] #####
 
