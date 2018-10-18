@@ -12,6 +12,7 @@ import os
 from pathlib import Path
 import random as rand
 import sys
+import re
 from datetime import datetime, timedelta
 from time import time as timestamp
 import json
@@ -298,9 +299,12 @@ class Poll:
 
 class CustomBot(commands.Bot):
     """An extension of the discord.py Bot Class"""
-    def __init__(self, command_prefix, formatter=None, description=None, pm_help=False, **options):
+    def __init__(self, command_prefix, home_server_id="", formatter=None, description=None, pm_help=False, **options):
         """Custom constructor that creates some custom attributes"""
         super().__init__(command_prefix, formatter=formatter, description=description, pm_help=pm_help, options=options)
+
+        self.home_server_id = home_server_id
+        self.home_server = None
 
         self.config = Config()
         self.ongoing_polls = OngoingPolls()
@@ -322,7 +326,7 @@ class CustomBot(commands.Bot):
 
 ##### [ BOT INSTANTIATION ] #####
 
-BOT = CustomBot(description="Below is a listing for Bjarne's commands. Use '!' infront of any of them to execute a command, like '!help'", command_prefix="!")
+BOT = CustomBot(description="Below is a listing for Bjarne's commands. Use '!' infront of any of them to execute a command, like '!help'", command_prefix="!", home_server_id="405451738804518916")
 BOT.load_extension('modules.roles')
 BOT.load_extension('modules.weather')
 BOT.load_extension('modules.hangman')
@@ -424,6 +428,10 @@ DANK_MESSAGE_MAP = [
 async def on_message(message):
     """The 'on_message' event handler"""
 
+    # Fetch home_server if not existant
+    if not BOT.home_server and BOT.home_server_id == message.server.id:
+        BOT.home_server = message.server
+
     if message.author.id == BOT.user.id:
         return
 
@@ -433,20 +441,40 @@ async def on_message(message):
 
     await BOT.process_commands(message)
 
-    # dank messages - check per word in message
+    # Dank Messages - check per word in message
     if message.content and message.content[0] != BOT.command_prefix:
         split_message = message.content.lower().split(' ')
+        prog = re.compile("^<:\D+:(\d+)>$")
+
+        # Capsule this into its own function, code re-use
+        async def post_message_or_reaction(val):
+            # if key is an emoji string
+            emoji_match = prog.match(val)
+            if emoji_match:
+                if BOT.home_server:
+                    # Get the emoji ID from REGEXP match
+                    emoji_id = emoji_match[1]
+                    emoji = next((e for e in BOT.home_server.emojis if e.id == emoji_id), None)
+                    if emoji:
+                        await BOT.add_reaction(message, emoji)
+                    else:
+                        await BOT.send_message(message.channel, val)
+                else:
+                    await BOT.send_message(message.channel, val)
+            else:
+                await BOT.send_message(message.channel, val)
+
         for dankness in DANK_MESSAGE_MAP:
             key = dankness[0]
             val = dankness[1]
 
             if isinstance(key, list):
                 if any(x in split_message for x in key):
-                    await BOT.send_message(message.channel, val)
+                    await post_message_or_reaction(val)
                     break
             else:
                 if key in split_message:
-                    await BOT.send_message(message.channel, val)
+                    await post_message_or_reaction(val)
                     break
 
 ##### [ BOT COMMANDS ] #####
