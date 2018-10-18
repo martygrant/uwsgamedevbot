@@ -1,5 +1,6 @@
 """Look up definitions online using this Oxford Dictionary-powered command"""
 
+import os
 from datetime import datetime
 from urllib import parse
 import requests
@@ -16,8 +17,8 @@ class Dictionary:
     def __init__(self, bot):
         self.bot = bot
 
-        self.app_id = os.get_env('oxford-appid')
-        self.app_key = os.get_env('oxford-key')
+        self.app_id = os.getenv('oxford-appid')
+        self.app_key = os.getenv('oxford-key')
 
         self.base_address = "https://od-api.oxforddictionaries.com/api/v1"
         self.endpoints = {
