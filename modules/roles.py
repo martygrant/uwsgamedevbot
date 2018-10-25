@@ -46,7 +46,7 @@ class Roles:
 
     @commands.command(pass_context=True)
     async def roles(self, ctx):
-        """Display a `MessageEmbed` with available Reactions that add respective roles to the user"""
+        """Add a role to your profile to let us know more about you, like what year of your course you are in."""
         category = await self.collect_category(ctx)
         roles_to_add = await self.collect_roles(category["category"], category["message"], ctx)
         # Differentiate the two lists (user roles and selected roles)
