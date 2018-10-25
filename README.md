@@ -43,10 +43,11 @@ If you have any questions for making a contribution, or a code related question 
 * !urban - Search for an Urban Dictionary definition.
 * !report - Anonymously report user to society committee.
 * !hangman - Play an interactive game of Hangman.
+* !define - Get a dictionary definition of a specified word.
   
 ## Changelog
 * 0.5 - in development.
-  *
+  * !define - Get a dictionary definition of a specified word.
 * 0.4
   * !xckd - Get a random XCKD comic.
   * !eightball - Get some classic 8-ball wisdom.
