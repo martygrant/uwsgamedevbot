@@ -102,6 +102,7 @@ class Dictionary:
 
     @commands.command(pass_context=True)
     async def define(self, ctx):
+        """Get the definition of a specified word, like '!define computer'."""
         await self.bot.send_typing(ctx.message.channel)
 
         if len(ctx.message.content.split(' ')) == 1:
