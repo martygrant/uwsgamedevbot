@@ -831,7 +831,7 @@ async def wiki(ctx):
 
 @BOT.command(pass_context=True)
 async def translate(ctx):
-    """Translate a message like '!translate en ja hello' to translate 'hello' from English to Japanese. See https://en.wikipedia.org/wiki/ISO_639-1 for langauge codes."""
+    """Translate a message like '!translate en ja hello' to translate 'hello' from English to Japanese. See https://en.wikipedia.org/wiki/ISO_639-1 for language codes."""
 
     query = ctx.message.content
     query = query.split()
