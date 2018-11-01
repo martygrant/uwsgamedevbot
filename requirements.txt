@@ -2,3 +2,4 @@ discord.py
 weather-api
 requests
 wikipedia
+translate

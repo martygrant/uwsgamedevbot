@@ -23,7 +23,8 @@ import discord
 from discord.ext import commands
 from discord.utils import get
 import requests
-import wikipedia
+#import wikipedia
+from translate import Translator
 
 import utilities as utils
 import modules.roles
@@ -826,6 +827,36 @@ async def wiki(ctx):
     embed.add_field(name="Read More", value=URL)
     
     await BOT.say(embed=embed)
+
+
+@BOT.command(pass_context=True)
+async def translate(ctx):
+    """Translate a message like '!translate en ja hello' to translate 'hello' from English to Japanese. See https://en.wikipedia.org/wiki/ISO_639-1 for langauge codes."""
+
+    query = ctx.message.content
+    query = query.split()
+
+    fromlang = query[1]
+    tolang = query[2]
+
+    message = ""
+    for x in query[3:]:
+        message += x 
+        message += " "
+
+    translator = Translator(to_lang=tolang, from_lang=fromlang)
+    translation = translator.translate(message)
+
+    output = "`" + translation + "` <- "
+    output += message
+    output += " ("
+    output += fromlang
+    output += "-"
+    output += tolang
+    output += ")"
+
+    await BOT.say(output)
+
 
 ##### [ BOT LOGIN ] #####
 
