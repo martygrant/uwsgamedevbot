@@ -25,6 +25,7 @@ from discord.utils import get
 import requests
 #import wikipedia
 from translate import Translator
+from coinmarketcap import Market
 
 import utilities as utils
 import modules.roles
@@ -857,6 +858,59 @@ async def translate(ctx):
 
     await BOT.say(output)
 
+
+def cryptoChange(val):
+    if (val > 0):
+        return " :arrow_up:"
+    else:
+        return " :arrow_down:"
+
+@BOT.command(pass_context=True)
+async def crypto(ctx, *symbol):
+    """Get info about crypto currencies. '!crypto btc' to get info about one specific currency."""
+    coins = Market()
+    listings = coins.ticker(start=0, limit=10, convert='GBP')
+
+    t = listings["data"]
+    coinOutputs = []
+    for x in t:
+        coin = listings["data"][x]
+        output = ""
+        output += coin["name"]
+        output += " ("
+        output += coin["symbol"]
+        output += ") £"
+        output += str(round(coin["quotes"]["GBP"]["price"], 3))
+        output += "\t1hr % "
+
+        hr = coin["quotes"]["GBP"]["percent_change_1h"]
+        output += str(hr)
+        output += cryptoChange(hr)
+
+        output += "\t24hr % "
+
+        hr = coin["quotes"]["GBP"]["percent_change_24h"]
+        output += str(hr)
+        output += cryptoChange(hr)
+
+        output += "\t7d % "
+
+        hr = coin["quotes"]["GBP"]["percent_change_7d"]
+        output += str(hr)
+        output += cryptoChange(hr)
+        output += "\n"
+        coinOutputs.append(output)
+
+    output = ""
+    for x in coinOutputs:
+        output += x
+
+    if symbol:
+        for x in coinOutputs:
+            if x.find(str(symbol[0].upper())) >= 0:
+                output = x
+
+    await BOT.say(output)
 
 ##### [ BOT LOGIN ] #####
 
