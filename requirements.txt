@@ -3,3 +3,4 @@ weather-api
 requests
 wikipedia
 translate
+coinmarketcap
