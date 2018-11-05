@@ -45,11 +45,13 @@ If you have any questions for making a contribution, or a code related question 
 * !hangman - Play an interactive game of Hangman.
 * !define - Get a dictionary definition of a specified word.
 * !translate - Translate a message between specified languages.
+* !crypto - Get cryptocurrency prices.
   
 ## Changelog
 * 0.5 - in development.
   * !define - Get a dictionary definition of a specified word.
   * !translate - Translate a message between specified languages.
+  * !crypto - Get cryptocurrency prices.
 * 0.4
   * !xckd - Get a random XCKD comic.
   * !eightball - Get some classic 8-ball wisdom.
