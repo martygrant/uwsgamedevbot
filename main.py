@@ -26,6 +26,7 @@ import requests
 #import wikipedia
 from translate import Translator
 from coinmarketcap import Market
+from forex_python.converter import CurrencyRates
 
 import utilities as utils
 import modules.roles
@@ -911,6 +912,112 @@ async def crypto(ctx, *symbol):
                 output = x
 
     await BOT.say(output)
+
+
+@BOT.command(pass_context=True)
+async def convert(ctx, value: float, fromUnit, toUnit):
+    """Convert between quantities.
+    Metre to Imperial: feet, mile, yard, inch.
+    Temperatures: c, f, k.
+    Time: secs, mins, hours, days.
+    Currency: Forex symbols e.g USD, GBP etc.
+    """
+
+    message = "Conversion not yet supported. Use !help convert to see supported conversions."
+    result = value
+    valid = False
+
+    # Metre to Imperial Lengths
+    metreToImperial = {
+        "feet": 3.281,
+        "mile": 1609.344,
+        "yard": 1.094,
+        "inch": 39.37
+    }
+    
+    if fromUnit == "m" and toUnit in metreToImperial:
+        result = value * metreToImperial[toUnit]
+
+    if fromUnit in metreToImperial and toUnit == "m":
+        result = value / metreToImperial[fromUnit]
+
+    # Temperatures
+    if fromUnit == "c":
+        if toUnit == "k":
+            result = value + 273.15
+        if toUnit == "f":
+            result = (value * 9/5) + 32
+    if fromUnit == "k":
+        if toUnit == "c":
+            result = value - 273.15
+        if toUnit == "f":
+            result = (value - 273.15) * (9/5) + 32
+    if fromUnit == "f":
+        if toUnit == "c":
+            result = (value - 32) * 5/9
+        if toUnit == "k":
+            result = (value + -32) * (5/9) + 273.15
+
+    # Time
+    if fromUnit == "secs":
+        if toUnit == "mins":
+            result = value / 60
+        if toUnit == "hours":
+            result = value / 3600
+        if toUnit == "days":
+            result = value / 86400
+
+    if fromUnit == "mins":
+        if toUnit == "secs":
+            result = value * 60
+        if toUnit == "hours":
+            result = value / 60
+        if toUnit == "days":
+            result = value / 1440
+
+    if fromUnit == "hours":
+        if toUnit == "secs":
+            result = value * 3600
+        if toUnit == "mins":
+            result = value * 60
+        if toUnit == "days":
+            result = value / 24
+
+    if fromUnit == "days":
+        if toUnit == "secs":
+            result = value * 86400
+        if toUnit == "mins":
+            result = value * 1440
+        if toUnit == "hours":
+            result = value * 24
+
+    # Currency
+    currency = False
+    c = CurrencyRates()
+    try: 
+        currency = True
+        result = c.convert(fromUnit.upper(), toUnit.upper(), value)
+        message = "Conversion: " + str(value)
+        message += " "
+        message += fromUnit
+        message += " equals "
+        message += str(result)
+        message += " "
+        message += toUnit
+    except:
+        currency = False
+        pass
+
+    if result != value and currency == False:
+        message = "Conversion: " + str(value)
+        message += " "
+        message += fromUnit
+        message += " equals "
+        message += str(result)
+        message += " "
+        message += toUnit
+
+    await BOT.say(message)
 
 ##### [ BOT LOGIN ] #####
 
