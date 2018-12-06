@@ -1019,6 +1019,75 @@ async def convert(ctx, value: float, fromUnit, toUnit):
 
     await BOT.say(message)
 
+
+@BOT.command(pass_context=True)
+async def modules(ctx, course):
+    """Display course module ratings. Options are: CGT, CGD."""
+
+    message = "Module ratings for: `"
+    message += course.upper()
+    message += "`\n"
+
+    course = course.lower()
+
+    with open('courseratings.json') as f:
+        data = json.load(f)
+        for x in data[course].items():
+            message += x[0]
+            message += ":\t `"
+            message += str(x[1][0])
+            message += "` ("
+            message += str(len(x[1][1])) + " votes)"
+            message += "\n"
+
+    await BOT.say(message)
+
+
+
+@BOT.command(pass_context=True)
+async def ratemodule(ctx, *arg):
+    """Rate a course module at UWS. Specify command like '!ratecourse course rating module' e.g: '!ratecourse cgt 5 intro to programming'"""
+
+    message = ""
+
+    course = arg[0]
+    rating = float(arg[1])
+    module = ""
+    for x in arg[2:]:
+        module += x
+        module += " "
+    module = module[:-1]
+    
+    print(course)
+    print(rating)
+    print(module)
+
+    data = ""
+    with open('courseratings.json') as f:
+        data = json.load(f)
+
+        for x in data[course].items():
+            if module == x[0]:
+                x[1][1].append(rating)
+                print(x[1][1])
+
+                avg = 0
+                for y in x[1][1]:
+                    avg += y
+                avg = round(avg / len(x[1][1]), 2)
+                x[1][0] = avg
+                message = "New rating for `" 
+                message += module 
+                message += "` is `"
+                message += str(avg)
+                message += "`."
+
+    with open('courseratings.json', 'w') as outfile:
+        json.dump(data, outfile)
+
+
+    await BOT.say(message)
+
 ##### [ BOT LOGIN ] #####
 
 BOT.run(BOT_TOKEN)
