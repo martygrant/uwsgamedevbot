@@ -27,6 +27,7 @@ import requests
 from translate import Translator
 from coinmarketcap import Market
 from forex_python.converter import CurrencyRates
+import wolframalpha
 
 import utilities as utils
 import modules.roles
@@ -37,6 +38,7 @@ REPOSITORY_URL = "https://github.com/martygrant/uwsgamedevbot"
 VERSION_NUMBER = os.getenv('version')
 BOT_TOKEN = os.getenv('token')
 GIPHY_TOKEN = os.getenv('giphy')
+WOLFRAM_KEY = "42XXHU-YEK7852REU"
 
 ##### [ CLASSES ] #####
 
@@ -1092,6 +1094,23 @@ async def ratemodule(ctx, *arg):
 
 
 	await BOT.say(message)
+
+
+@BOT.command(pass_context=True)
+async def ask(ctx):
+	"""Submit a question to Wolfram Alpha."""
+
+	query = ctx.message.content
+	query = query[4:]
+
+	client = wolframalpha.Client(WOLFRAM_KEY)
+
+	res = client.query(query)
+
+	query = next(res.results).text
+
+	await BOT.say(query)
+
 
 ##### [ BOT LOGIN ] #####
 
