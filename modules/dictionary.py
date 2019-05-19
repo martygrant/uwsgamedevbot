@@ -13,7 +13,7 @@ OXFORD_IMAGE_URL = "https://developer.oxforddictionaries.com/images/PBO_black.pn
 OXFORD_API_URL = "https://developer.oxforddictionaries.com/"
 OXFORD_BASE_SEARCH = "https://en.oxforddictionaries.com/definition/"
 
-class Dictionary:
+class Dictionary(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 

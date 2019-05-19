@@ -39,7 +39,7 @@ ROLE_CATEGORIES = {
     ]
 }
 
-class Roles:
+class Roles(commands.Cog):
     """The `Role` class that declares methods to add users to specified roles"""
     def __init__(self, bot):
         self.bot = bot

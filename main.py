@@ -435,8 +435,8 @@ async def on_message(message):
 	"""The 'on_message' event handler"""
 
 	# Fetch home_server if not existant
-	if not BOT.home_server and BOT.home_server_id == message.server.id:
-		BOT.home_server = message.server
+	if not BOT.home_server and BOT.home_server_id == message.guild.id:
+		BOT.home_server = message.guild
 
 	if message.author.id == BOT.user.id:
 		return
@@ -486,19 +486,18 @@ async def on_message(message):
 ##### [ BOT COMMANDS ] #####
 
 @BOT.command()
-async def say(*something):
+async def say(ctx, *something):
 	"""Make Bjarne say something."""
 	if something:
-		await BOT.say(" ".join(something))
+		await ctx.send(" ".join(something))
 
 @BOT.command()
-async def version():
+async def version(ctx):
 	"""Display Bjarne version info."""
-	await BOT.say("v{} - {}".format(VERSION_NUMBER, REPOSITORY_URL))
-
+	await ctx.send("v{} - {}".format(VERSION_NUMBER, REPOSITORY_URL))
 
 @BOT.command()
-async def bjarnequote():
+async def bjarnequote(ctx):
 	"""Get a quote from Bjarne Stroustrup, creator of C++."""
 	quotes = [
 		'A program that has not been tested does not work.',
@@ -524,10 +523,10 @@ async def bjarnequote():
 	
 	BOT.lastBjarneChoice = choice
 
-	await BOT.say(choice)
+	await ctx.send(choice)
 
 @BOT.command()
-async def random(*arg):
+async def random(ctx, *arg):
 	"""Generate a random number. Use '!help random' for usage.
 	!random for any random number.
 	!random x for between 0 and x.
@@ -548,12 +547,12 @@ async def random(*arg):
 			y = int(arg[1])
 			random_number = rand.randint(x, y)
 
-	await BOT.say(random_number)
+	await ctx.send(random_number)
 
 @BOT.command()
-async def dice():
+async def dice(ctx):
 	"""Roll a dice."""
-	await BOT.say(rand.randint(1, 6))
+	await ctx.send(rand.randint(1, 6))
 
 # todo: use arguments, should make this command much simpler
 @BOT.command()
@@ -610,9 +609,9 @@ async def math(*, arg):
 		# Strip trailing 0s if we just have a whole number result
 		z = '%g' % (Decimal(str(z)))
 
-	await BOT.say(z)
+	await ctx.send(z)
 
-@BOT.command(pass_context=True)
+@BOT.command()
 async def quote(ctx, *arg):
 	"""Quote a user randomly. Usage: !quote <username>, if no user is specified it will quote yourself."""
 	channel = ctx.message.channel
@@ -640,21 +639,21 @@ async def quote(ctx, *arg):
 
 	# Pick a random message and output it
 	random_message = messages[rand.randint(0, len(messages))]
-	await BOT.say("{} once said: `{}`".format(user, random_message))
+	await ctx.send("{} once said: `{}`".format(user, random_message))
 
-@BOT.command(pass_context=True)
+@BOT.command()
 async def poll(ctx):
 	"""Starts a new poll. Usage: !poll -Question -durationInSeconds -Option -Option -Option..."""
 	args = ctx.message.content.split("-")
 	if len(args) < 2:
-		return await BOT.say("Please see the command usage for this command: `{}poll -Question -durationInSeconds -Option -Option -Option...`".format(BOT.command_prefix))
+		return await ctx.send("Please see the command usage for this command: `{}poll -Question -durationInSeconds -Option -Option -Option...`".format(BOT.command_prefix))
 
 	question = args[1]
 	duration = args[2]
 
 	duration_float = float(duration)
 	if duration_float > 86400:
-		return await BOT.say("Poll cannot last longer than one day (86400 seconds).")
+		return await ctx.send("Poll cannot last longer than one day (86400 seconds).")
 
 	args.pop(0)
 	args.pop(0)
@@ -692,10 +691,10 @@ def getNewestMember(users):
 	return newest
 
 
-@BOT.command(pass_context=True)
+@BOT.command()
 async def stats(ctx):
 	"""Get server statistics."""
-	server = ctx.message.author.server
+	server = ctx.message.author.guild
 	serverName = server.name
 	numberOfUsers = server.member_count
 	members = server.members
@@ -711,10 +710,10 @@ async def stats(ctx):
 	embed.add_field(name="Users Total", value=numberOfUsers)
 	embed.add_field(name="Newest Member", value=newestMember)
 
-	await BOT.say(embed=embed)
+	await ctx.send(embed=embed)
 
 
-@BOT.command(pass_context=True)
+@BOT.command()
 async def urban(ctx, query):
 	"""Search for a definition from Urban Dictionary."""
 
@@ -738,10 +737,10 @@ async def urban(ctx, query):
 	embed.add_field(name="Example", value=example)
 	embed.add_field(name="URL", value=url)
 	
-	await BOT.say(embed=embed)
+	await ctx.send(embed=embed)
 
 
-@BOT.command(pass_context=True)
+@BOT.command()
 async def report(ctx, user):
 	"""Report a user anonymously to the society committee. Usage: !report <user> <reason>"""
 	BOT.config["bot"]["channels"]["bjarne"]
@@ -757,7 +756,7 @@ async def report(ctx, user):
 	await BOT.send_message(BOT.config["bot"]["channels"]["committee"], message)
 
 
-@BOT.command(pass_context=True)
+@BOT.command()
 async def eightball(ctx, *arg):
 	"""Let the magic 8 ball provide you with wisdom."""
 	if arg:
@@ -792,12 +791,12 @@ async def eightball(ctx, *arg):
 		
 		BOT.last8BallChoice = choice
 
-		await BOT.say(choice)
+		await ctx.send(choice)
 	else:
-		await BOT.say("You must ask a question!")
+		await ctx.send("You must ask a question!")
 
 
-@BOT.command(pass_context=True)
+@BOT.command()
 async def xkcd(ctx):
 	"""Get a random XKCD comic."""
 
@@ -808,10 +807,10 @@ async def xkcd(ctx):
 	data = response.json()
 
 	comic = data["img"]
-	await BOT.say(comic)
+	await ctx.send(comic)
 
 
-@BOT.command(pass_context=True)
+@BOT.command()
 async def wiki(ctx):
 	"""Get the first few sentences of a Wikipedia page."""
 
@@ -830,10 +829,10 @@ async def wiki(ctx):
 	embed.add_field(name="Summary", value=summary)
 	embed.add_field(name="Read More", value=URL)
 	
-	await BOT.say(embed=embed)
+	await ctx.send(embed=embed)
 
 
-@BOT.command(pass_context=True)
+@BOT.command()
 async def translate(ctx):
 	"""Translate a message like '!translate en ja hello' to translate 'hello' from English to Japanese. See https://en.wikipedia.org/wiki/ISO_639-1 for language codes."""
 
@@ -859,7 +858,7 @@ async def translate(ctx):
 	output += tolang
 	output += ")"
 
-	await BOT.say(output)
+	await ctx.send(output)
 
 
 def cryptoChange(val):
@@ -868,7 +867,7 @@ def cryptoChange(val):
 	else:
 		return " :arrow_down:"
 
-@BOT.command(pass_context=True)
+@BOT.command()
 async def crypto(ctx, *symbol):
 	"""Get info about crypto currencies. '!crypto btc' to get info about one specific currency."""
 	coins = Market()
@@ -913,10 +912,10 @@ async def crypto(ctx, *symbol):
 			if x.find(str(symbol[0].upper())) >= 0:
 				output = x
 
-	await BOT.say(output)
+	await ctx.send(output)
 
 
-@BOT.command(pass_context=True)
+@BOT.command()
 async def convert(ctx, value: float, fromUnit, toUnit):
 	"""Convert between quantities.
 	Metre to Imperial: feet, mile, yard, inch.
@@ -1019,10 +1018,10 @@ async def convert(ctx, value: float, fromUnit, toUnit):
 		message += " "
 		message += toUnit
 
-	await BOT.say(message)
+	await ctx.send(message)
 
 
-@BOT.command(pass_context=True)
+@BOT.command()
 async def modules(ctx, course):
 	"""Display course module ratings. Options are: CGT, CGD."""
 
@@ -1042,11 +1041,11 @@ async def modules(ctx, course):
 			message += str(len(x[1][1])) + " votes)"
 			message += "\n"
 
-	await BOT.say(message)
+	await ctx.send(message)
 
 
 
-@BOT.command(pass_context=True)
+@BOT.command()
 async def ratemodule(ctx, *arg):
 	"""Rate a course module at UWS. Specify command like '!ratecourse course rating module' e.g: '!ratecourse cgt 5 intro to programming'"""
 
@@ -1093,10 +1092,10 @@ async def ratemodule(ctx, *arg):
 				json.dump(data, outfile)
 
 
-	await BOT.say(message)
+	await ctx.send(message)
 
 
-@BOT.command(pass_context=True)
+@BOT.command()
 async def ask(ctx):
 	"""Submit a question to Wolfram Alpha."""
 
@@ -1109,7 +1108,7 @@ async def ask(ctx):
 
 	query = next(res.results).text
 
-	await BOT.say(query)
+	await ctx.send(query)
 
 
 ##### [ BOT LOGIN ] #####
