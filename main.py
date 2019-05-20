@@ -30,7 +30,6 @@ from forex_python.converter import CurrencyRates
 import wolframalpha
 
 import utilities as utils
-import modules.roles
 import modules.weather
 import modules.hangman
 
@@ -332,7 +331,6 @@ class CustomBot(commands.Bot):
 ##### [ BOT INSTANTIATION ] #####
 
 BOT = CustomBot(description="Below is a listing for Bjarne's commands. Use '!' infront of any of them to execute a command, like '!help'", command_prefix="!", home_server_id="405451738804518916")
-BOT.load_extension('modules.roles')
 BOT.load_extension('modules.weather')
 BOT.load_extension('modules.hangman')
 BOT.load_extension('modules.dictionary')
@@ -352,14 +350,19 @@ async def on_member_join(member):
 	# Refresh channel IDs
 	BOT.config.refresh()
 
+	# Add a temporary role that disallows access to all channels until confirming the rules
+	await member.add_roles(*list(filter(lambda r: r.name == "Didn't read the Rules", member.guild.roles)))
+
+	# Return if member is test user
+	if member.id == "162606144722829312":
+		return
+
 	welcome_message = """Welcome to the **UWS Game Dev Society**!
 
 Please check out {} and set your server nickname to your real name. Visit {} to see what events are coming up! Why not introduce yourself in {}?
 Please conduct yourself professionally in public-facing channels like {}. Thanks!
 
 Type `!help` for a list of my commands.
-
-Use `!role <role name>` to add a role to your account. Use `!roles` to see what roles are available. This must be done in the {} channel.
 
 """.format("<#{}>".format(BOT.config["bot"]["channels"]["rules"]), "<#{}>".format(BOT.config["bot"]["channels"]["announcements"]), "<#{}>".format(BOT.config["bot"]["channels"]["introductions"]), "<#{}>".format(BOT.config["bot"]["channels"]["lobby"]), "<#{}>".format(BOT.config["bot"]["channels"]["role-assignment"]))
 
@@ -371,6 +374,10 @@ Use `!role <role name>` to add a role to your account. Use `!roles` to see what 
 @BOT.event
 async def on_member_remove(member):
 	"""The 'on_member_remove' event"""
+
+	# Return if member is test user
+	if member.id == 162606144722829312:
+		return
 
 	# Refresh channel IDs
 	BOT.config.refresh()
@@ -389,39 +396,153 @@ async def on_message_delete(message):
 	await BOT.send_message(deleted_poll.initiator, "Your poll with the question `{}` in {} was deleted. Here are the results.".format(deleted_poll.question, deleted_poll.channel.mention), embed=deleted_poll.embed)
 
 @BOT.event
+async def on_raw_reaction_add(payload):
+	"""The 'on_raw_reaction_add' event"""
+
+	if payload.user_id == BOT.user.id:
+		return
+
+	if payload.channel_id not in [579342050156347392, 579308807453409280]:
+		return
+
+	# Fetch reactor Message and Member objects
+	message = await BOT.get_channel(payload.channel_id).fetch_message(payload.message_id)
+	if payload.user_id in list(map(lambda m: m.id, message.guild.members)):
+		member = message.guild.get_member(payload.user_id)
+	else:
+		member = await message.guild.fetch_member(payload.user_id)
+
+	if any(obj is None for obj in (message, message.guild, member)):
+		return
+
+	if message.guild.id != 405451738804518916:
+		return
+
+	# Reaction is for rules confirmation message
+	if message.id == 579342665368338441:
+		if payload.emoji.name == "👌":
+			await member.remove_roles(*list(filter(lambda r: r.name == "Didn't read the Rules", member.guild.roles)))
+		return
+
+	# Reaction is for 'Level of Study' Role Selection
+	elif message.id == 579331851899109387:
+		if any(emoji == payload.emoji for emoji in utils.NUMBER_EMOJIS):
+			selected_option = utils.NUMBER_EMOJIS.index(payload.emoji)
+			uws_roles = ["1st Year", "2nd Year", "3rd Year", "4th Year", "PhD", "Graduate"]
+
+	# Reaction is for 'Course' Role Selection
+	elif message.id == 579332663312121886:
+		if any(emoji == payload.emoji for emoji in utils.NUMBER_EMOJIS):
+			selected_option = utils.NUMBER_EMOJIS.index(payload.emoji)
+			uws_roles = ["Computer Animation Arts", "Computer Games (Art and Animation)", "Computer Games Development", "Computer Games Technology", "Computer Science", "Digital Art & Design", "Ecology", "Information Technology", "Web and Mobile Development"]
+
+	# Reaction is for 'Institution' Role Selection
+	elif message.id == 579333086018535424:
+		if any(emoji == payload.emoji for emoji in utils.NUMBER_EMOJIS):
+			selected_option = utils.NUMBER_EMOJIS.index(payload.emoji)
+			uws_roles = ["University of the West of Scotland", "West College Scotland", "Abertay University", "Glasgow Caledonian University", "Strathclyde University"]
+
+	# Reaction is for 'Other' Role Selection
+	elif message.id == 579333442089779204:
+		if any(emoji == payload.emoji for emoji in utils.NUMBER_EMOJIS):
+			selected_option = utils.NUMBER_EMOJIS.index(payload.emoji)
+			uws_roles = ["Bjarne Development", "HNC", "HND"]
+
+	else:
+		return
+
+	await member.add_roles(*list(filter(lambda r: r.name == uws_roles[selected_option], member.guild.roles)))
+
+@BOT.event
+async def on_raw_reaction_remove(payload):
+	"""The 'on_raw_reaction_remove' event"""
+
+	if payload.user_id == BOT.user.id:
+		return
+
+	if payload.channel_id not in [579342050156347392, 579308807453409280]:
+		return
+
+	# Fetch reactor Message and Member objects
+	message = await BOT.get_channel(payload.channel_id).fetch_message(payload.message_id)
+	if payload.user_id in list(map(lambda m: m.id, message.guild.members)):
+		member = message.guild.get_member(payload.user_id)
+	else:
+		member = await message.guild.fetch_member(payload.user_id)
+
+	if any(obj is None for obj in (message, message.guild, member)):
+		return
+
+	if message.guild.id != 405451738804518916:
+		return
+
+	# Reaction is for 'Level of Study' Role Selection
+	elif message.id == 579331851899109387:
+		if any(emoji == payload.emoji for emoji in utils.NUMBER_EMOJIS):
+			selected_option = utils.NUMBER_EMOJIS.index(payload.emoji)
+			uws_roles = ["1st Year", "2nd Year", "3rd Year", "4th Year", "PhD", "Graduate"]
+
+	# Reaction is for 'Course' Role Selection
+	elif message.id == 579332663312121886:
+		if any(emoji == payload.emoji for emoji in utils.NUMBER_EMOJIS):
+			selected_option = utils.NUMBER_EMOJIS.index(payload.emoji)
+			uws_roles = ["Computer Animation Arts", "Computer Games (Art and Animation)", "Computer Games Development", "Computer Games Technology", "Computer Science", "Digital Art & Design", "Ecology", "Information Technology", "Web and Mobile Development"]
+
+	# Reaction is for 'Institution' Role Selection
+	elif message.id == 579333086018535424:
+		if any(emoji == payload.emoji for emoji in utils.NUMBER_EMOJIS):
+			selected_option = utils.NUMBER_EMOJIS.index(payload.emoji)
+			uws_roles = ["University of the West of Scotland", "West College Scotland", "Abertay University", "Glasgow Caledonian University", "Strathclyde University"]
+
+	# Reaction is for 'Other' Role Selection
+	elif message.id == 579333442089779204:
+		if any(emoji == payload.emoji for emoji in utils.NUMBER_EMOJIS):
+			selected_option = utils.NUMBER_EMOJIS.index(payload.emoji)
+			uws_roles = ["Bjarne Development", "HNC", "HND"]
+
+	else:
+		return
+
+	await member.remove_roles(*list(filter(lambda r: r.name == uws_roles[selected_option], member.guild.roles)))
+
+@BOT.event
 async def on_reaction_add(reaction, user):
 	"""The 'on_reaction_add' event"""
 
-	if user.id == BOT.user.id or reaction.message.id not in BOT.ongoing_polls:
+	if user.id == BOT.user.id:
 		return
 
-	current_poll = BOT.ongoing_polls[reaction.message.id]
-	# If the reaction is the same as any of the existing reactions
-	if any(utils.resolve_emoji_from_alphabet(option) == reaction.emoji for option in current_poll.results.keys()):
-		# Add the user to the respective result object
-		selected_option = utils.resolve_letter_from_emoji(reaction.emoji)
-		if user.id not in current_poll.results[selected_option]:
-			current_poll.add_vote(selected_option, user)
+	if reaction.message.id in BOT.ongoing_polls:
+		current_poll = BOT.ongoing_polls[reaction.message.id]
 
-		# Update the original poll message
-		await BOT.edit_message(current_poll.question_message, embed=current_poll.embed)
+		# If the reaction is the same as any of the existing reactions
+		if any(utils.resolve_emoji_from_alphabet(option) == reaction.emoji for option in current_poll.results.keys()):
+			# Add the user to the respective result object
+			selected_option = utils.resolve_letter_from_emoji(reaction.emoji)
+			if user.id not in current_poll.results[selected_option]:
+				current_poll.add_vote(selected_option, user)
+
+			# Update the original poll message
+			return await BOT.edit_message(current_poll.question_message, embed=current_poll.embed)
 
 @BOT.event
 async def on_reaction_remove(reaction, user):
 	"""The 'on_reaction_remove' event"""
-	if reaction.message.id not in BOT.ongoing_polls or user.id == BOT.user.id:
+
+	if user.id == BOT.user.id:
 		return
 
-	current_poll = BOT.ongoing_polls[reaction.message.id]
-	# If the reaction is the same as any of the existing reactions
-	if any(utils.resolve_emoji_from_alphabet(option) == reaction.emoji for option in current_poll.results.keys()):
-		# Remove the user from the respective result object
-		deselected_option = utils.resolve_letter_from_emoji(reaction.emoji)
-		if user.id in current_poll.results[deselected_option]:
-			current_poll.remove_vote(deselected_option, user)
+	if reaction.message.id in BOT.ongoing_polls:
+		current_poll = BOT.ongoing_polls[reaction.message.id]
+		# If the reaction is the same as any of the existing reactions
+		if any(utils.resolve_emoji_from_alphabet(option) == reaction.emoji for option in current_poll.results.keys()):
+			# Remove the user from the respective result object
+			deselected_option = utils.resolve_letter_from_emoji(reaction.emoji)
+			if user.id in current_poll.results[deselected_option]:
+				current_poll.remove_vote(deselected_option, user)
 
-		# Update the original poll message
-		await BOT.edit_message(current_poll.question_message, embed=current_poll.embed)
+			# Update the original poll message
+			return await BOT.edit_message(current_poll.question_message, embed=current_poll.embed)
 
 DANK_MESSAGE_MAP = [
 	["ayy", "lmao"],
