@@ -353,34 +353,35 @@ async def on_member_join(member):
 	# Add a temporary role that disallows access to all channels until confirming the rules
 	await member.add_roles(*list(filter(lambda r: r.name == "Didn't read the Rules", member.guild.roles)))
 
-	# Return if member is test user
-	if member.id == "162606144722829312":
-		return
+	welcome_message = """Welcome to the **UWS Game Development Society**!
 
-	welcome_message = """Welcome to the **UWS Game Dev Society**!
-
-Please check out {} and set your server nickname to your real name. Visit {} to see what events are coming up! Why not introduce yourself in {}?
-Please conduct yourself professionally in public-facing channels like {}. Thanks!
+Please review the rules in the <#579342050156347392> channel. When you're done, simply click on the :ok_hand: emoji right below the message. This will give you access to a lot more channels.
 
 Type `!help` for a list of my commands.
 
-""".format("<#{}>".format(BOT.config["bot"]["channels"]["rules"]), "<#{}>".format(BOT.config["bot"]["channels"]["announcements"]), "<#{}>".format(BOT.config["bot"]["channels"]["introductions"]), "<#{}>".format(BOT.config["bot"]["channels"]["lobby"]), "<#{}>".format(BOT.config["bot"]["channels"]["role-assignment"]))
+"""
 
 	# Send the welcome message to the user individually
-	await BOT.send_message(member, welcome_message)
-	# Announce a new member joining in the lobby channel
-	await BOT.send_message(BOT.config["bot"]["channels"]["lobby"], "Welcome {} to the UWS Game Dev Society!".format(member.mention))
-
-@BOT.event
-async def on_member_remove(member):
-	"""The 'on_member_remove' event"""
+	await member.send(welcome_message)
 
 	# Return if member is test user
 	if member.id == 162606144722829312:
 		return
 
+	# Announce a new member joining in the lobby channel
+	welcome_channel = member.guild.get_channel(412327350366240768)
+	await welcome_channel.send("Welcome {} to the UWS Game Dev Society!".format(member.mention))
+
+@BOT.event
+async def on_member_remove(member):
+	"""The 'on_member_remove' event"""
+
 	# Refresh channel IDs
 	BOT.config.refresh()
+
+	# Return if member is test user
+	if member.id == 162606144722829312:
+		return
 
 	await BOT.send_message(BOT.config["channels"]["lobby"], "User **{}** has left the server. Goodbye!".format(str(member)))
 
@@ -422,6 +423,7 @@ async def on_raw_reaction_add(payload):
 	if message.id == 579342665368338441:
 		if payload.emoji.name == "👌":
 			await member.remove_roles(*list(filter(lambda r: r.name == "Didn't read the Rules", member.guild.roles)))
+			await member.send("Thanks for taking the time to read through our rules. You can now add roles/tags to your profile by heading over to the <#579308807453409280> channel, which is recommended as you'll get access to course-specific channels and allows other members of the server to see what courses you are in.\n\nYou can always review the rules and add/remove any roles by re-visiting <#579308807453409280>.\n\nOnce you've done that, please server nickname to your real name or an abbreviation of your name. Make sure to visit <#405737395477020682> to see what events are coming up? Maybe introduce yourself in <#413835267557031937>!\n\nFinally, please conduct yourself professionally in public-facing channels like {}. Thanks!")
 		return
 
 	# Reaction is for 'Level of Study' Role Selection
