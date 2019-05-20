@@ -158,7 +158,7 @@ class HangmanGame:
         del self.bot.hangman_games[self.channel_id]
         await self.bot.edit_message(self.message, embed=embed)
 
-class Hangman:
+class Hangman(commands.Cog):
     """The `Hangman` class"""
     def __init__(self, bot):
         self.bot = bot

@@ -4,7 +4,7 @@ from weather import Weather as w, Unit
 import utilities as utils
 from datetime import datetime, timedelta
 
-class Weather:
+class Weather(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
 		self.weather_object = w(unit=Unit.CELSIUS)
