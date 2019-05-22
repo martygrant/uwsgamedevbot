@@ -39,6 +39,9 @@ BOT_TOKEN = os.getenv('token')
 GIPHY_TOKEN = os.getenv('giphy')
 WOLFRAM_KEY = "42XXHU-YEK7852REU"
 
+true = True
+false = False
+
 ##### [ CLASSES ] #####
 
 class SavableDict(dict):
@@ -419,41 +422,54 @@ async def on_raw_reaction_add(payload):
 	if message.guild.id != 405451738804518916:
 		return
 
+	uws_roles = None
+	selected_option = None
+	delete_other_roles = False
+
 	# Reaction is for rules confirmation message
 	if message.id == 579342665368338441:
 		if payload.emoji.name == "👌":
 			await member.remove_roles(*list(filter(lambda r: r.name == "Didn't read the Rules", member.guild.roles)))
-			await member.send("Thanks for taking the time to read through our rules. You can now add roles/tags to your profile by heading over to the <#579308807453409280> channel, which is recommended as you'll get access to course-specific channels and allows other members of the server to see what courses you are in.\n\nYou can always review the rules and add/remove any roles by re-visiting <#579308807453409280>.\n\nOnce you've done that, please server nickname to your real name or an abbreviation of your name. Make sure to visit <#405737395477020682> to see what events are coming up? Maybe introduce yourself in <#413835267557031937>!\n\nFinally, please conduct yourself professionally in public-facing channels like {}. Thanks!")
+			await member.send("**==============================================\nThanks for taking the time to read through our rules**. You can now add roles/tags to your profile by heading over to the <#579308807453409280> channel, which is recommended as you'll get access to course-specific channels and allows other members of the server to see what courses you are in.\n\nYou can always review the rules and add/remove any roles by re-visiting <#579308807453409280>.\n\nOnce you've done that, please change your server nickname to your real name or an abbreviation of your name. Make sure to visit <#405737395477020682> to see what events are coming up? Maybe introduce yourself in <#413835267557031937>!")
 		return
 
 	# Reaction is for 'Level of Study' Role Selection
 	elif message.id == 579331851899109387:
-		if any(emoji == payload.emoji for emoji in utils.NUMBER_EMOJIS):
-			selected_option = utils.NUMBER_EMOJIS.index(payload.emoji)
+		if any(payload.emoji.name == emoji for emoji in utils.NUMBER_EMOJIS):
+			selected_option = utils.NUMBER_EMOJIS.index(payload.emoji.name)
 			uws_roles = ["1st Year", "2nd Year", "3rd Year", "4th Year", "PhD", "Graduate"]
+			delete_other_roles = True
 
 	# Reaction is for 'Course' Role Selection
 	elif message.id == 579332663312121886:
-		if any(emoji == payload.emoji for emoji in utils.NUMBER_EMOJIS):
-			selected_option = utils.NUMBER_EMOJIS.index(payload.emoji)
+		if any(payload.emoji.name == emoji for emoji in utils.NUMBER_EMOJIS):
+			selected_option = utils.NUMBER_EMOJIS.index(payload.emoji.name)
 			uws_roles = ["Computer Animation Arts", "Computer Games (Art and Animation)", "Computer Games Development", "Computer Games Technology", "Computer Science", "Digital Art & Design", "Ecology", "Information Technology", "Web and Mobile Development"]
+			delete_other_roles = True
 
 	# Reaction is for 'Institution' Role Selection
 	elif message.id == 579333086018535424:
-		if any(emoji == payload.emoji for emoji in utils.NUMBER_EMOJIS):
-			selected_option = utils.NUMBER_EMOJIS.index(payload.emoji)
+		if any(payload.emoji.name == emoji for emoji in utils.NUMBER_EMOJIS):
+			selected_option = utils.NUMBER_EMOJIS.index(payload.emoji.name)
 			uws_roles = ["University of the West of Scotland", "West College Scotland", "Abertay University", "Glasgow Caledonian University", "Strathclyde University"]
 
 	# Reaction is for 'Other' Role Selection
 	elif message.id == 579333442089779204:
-		if any(emoji == payload.emoji for emoji in utils.NUMBER_EMOJIS):
-			selected_option = utils.NUMBER_EMOJIS.index(payload.emoji)
+		if any(payload.emoji.name == emoji for emoji in utils.NUMBER_EMOJIS):
+			selected_option = utils.NUMBER_EMOJIS.index(payload.emoji.name)
 			uws_roles = ["Bjarne Development", "HNC", "HND"]
 
 	else:
 		return
 
-	await member.add_roles(*list(filter(lambda r: r.name == uws_roles[selected_option], member.guild.roles)))
+	if selected_option >= 0 and uws_roles:
+		await member.add_roles(*list(filter(lambda r: r.name == uws_roles[selected_option], member.guild.roles)))
+		if delete_other_roles:
+			roles_to_delete = list(filter(lambda r: r.name in uws_roles and r.name != uws_roles[selected_option], member.roles))
+			await member.remove_roles(*roles_to_delete)
+			for r in roles_to_delete:
+				reaction_to_delete = utils.NUMBER_EMOJIS[uws_roles.index(r.name)]
+				await message.remove_reaction(reaction_to_delete, member)
 
 @BOT.event
 async def on_raw_reaction_remove(payload):
@@ -478,34 +494,38 @@ async def on_raw_reaction_remove(payload):
 	if message.guild.id != 405451738804518916:
 		return
 
+	uws_roles = None
+	selected_option = None
+
 	# Reaction is for 'Level of Study' Role Selection
-	elif message.id == 579331851899109387:
-		if any(emoji == payload.emoji for emoji in utils.NUMBER_EMOJIS):
-			selected_option = utils.NUMBER_EMOJIS.index(payload.emoji)
+	if message.id == 579331851899109387:
+		if any(emoji == payload.emoji.name for emoji in utils.NUMBER_EMOJIS):
+			selected_option = utils.NUMBER_EMOJIS.index(payload.emoji.name)
 			uws_roles = ["1st Year", "2nd Year", "3rd Year", "4th Year", "PhD", "Graduate"]
 
 	# Reaction is for 'Course' Role Selection
 	elif message.id == 579332663312121886:
-		if any(emoji == payload.emoji for emoji in utils.NUMBER_EMOJIS):
-			selected_option = utils.NUMBER_EMOJIS.index(payload.emoji)
+		if any(emoji == payload.emoji.name for emoji in utils.NUMBER_EMOJIS):
+			selected_option = utils.NUMBER_EMOJIS.index(payload.emoji.name)
 			uws_roles = ["Computer Animation Arts", "Computer Games (Art and Animation)", "Computer Games Development", "Computer Games Technology", "Computer Science", "Digital Art & Design", "Ecology", "Information Technology", "Web and Mobile Development"]
 
 	# Reaction is for 'Institution' Role Selection
 	elif message.id == 579333086018535424:
-		if any(emoji == payload.emoji for emoji in utils.NUMBER_EMOJIS):
-			selected_option = utils.NUMBER_EMOJIS.index(payload.emoji)
+		if any(emoji == payload.emoji.name for emoji in utils.NUMBER_EMOJIS):
+			selected_option = utils.NUMBER_EMOJIS.index(payload.emoji.name)
 			uws_roles = ["University of the West of Scotland", "West College Scotland", "Abertay University", "Glasgow Caledonian University", "Strathclyde University"]
 
 	# Reaction is for 'Other' Role Selection
 	elif message.id == 579333442089779204:
-		if any(emoji == payload.emoji for emoji in utils.NUMBER_EMOJIS):
-			selected_option = utils.NUMBER_EMOJIS.index(payload.emoji)
+		if any(emoji == payload.emoji.name for emoji in utils.NUMBER_EMOJIS):
+			selected_option = utils.NUMBER_EMOJIS.index(payload.emoji.name)
 			uws_roles = ["Bjarne Development", "HNC", "HND"]
 
 	else:
 		return
 
-	await member.remove_roles(*list(filter(lambda r: r.name == uws_roles[selected_option], member.guild.roles)))
+	if selected_option >= 0 and uws_roles:
+		await member.remove_roles(*list(filter(lambda r: r.name == uws_roles[selected_option], member.guild.roles)))
 
 @BOT.event
 async def on_reaction_add(reaction, user):
