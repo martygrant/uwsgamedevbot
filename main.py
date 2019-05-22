@@ -89,43 +89,6 @@ class SavableDict(dict):
 		encoded_json = json.dumps(self.raw_dict, indent=2)
 		self._file_handle.write_text(encoded_json)
 
-class Config(SavableDict):
-	"""The config class"""
-	@property
-	def raw_dict(self):
-		"""Returns a custom representation of this dict"""
-		return {
-			"bot": {
-				"channels": {
-					"lobby": self["bot"]["channels"]["lobby"],
-					"rules": self["bot"]["channels"]["rules"],
-					"announcements": self["bot"]["channels"]["announcements"],
-					"introductions": self["bot"]["channels"]["introductions"],
-					"role-assignment": self["bot"]["channels"]["role-assignment"],
-					"bjarne": self["bot"]["channels"]["bjarne"],
-					"committee": self["bot"]["channels"]["committee"],
-				}
-			}
-		}
-	
-	def __init__(self):
-		super().__init__("config.json")
-
-	def refresh(self):
-		"""Refreshes the dict from file"""
-		new_config = {}
-		with open(self._dest, 'r') as file:
-			new_config = json.loads(file.read())
-
-		# Remove any properties that are not part of the new config
-		for key, val in self.raw_dict.items():
-			if key not in new_config:
-				del self[key]
-
-		# Overwrite any new properties
-		for key, val in new_config.items():
-			self[key] = val
-
 class OngoingPolls(SavableDict):
 	"""The class responsible for poll persistence"""
 	@property
@@ -273,7 +236,7 @@ class Poll:
 		"""Starts the poll and creates a task for the poll to end using by the duration"""
 		# Send a new message if one wasn't already passed to the constructor
 		if self.question_message is None:
-			self.question_message = await BOT.send_message(self.channel, embed=self.embed)
+			self.question_message = await self.channel.send(embed=self.embed)
 		BOT.ongoing_polls[self.question_message.id] = self
 
 		if self.question_message not in BOT.messages:
@@ -292,7 +255,7 @@ class Poll:
 
 		# TODO: finalise data to prettify output
 
-		await BOT.send_message(self.channel, "**{}**'s poll has finished. Here are the results.".format(self.initiator.mention), embed=self.embed)
+		await self.channel.send("**{}**'s poll has finished. Here are the results.".format(self.initiator.mention), embed=self.embed)
 		# BOT.ongoing_polls.pop(self.question_message.id, self)
 		del BOT.ongoing_polls[self.question_message.id]
 
@@ -313,20 +276,7 @@ class CustomBot(commands.Bot):
 		self.home_server_id = home_server_id
 		self.home_server = None
 
-		self.config = Config()
 		self.ongoing_polls = OngoingPolls()
-
-	def get_message(self, channel, message_id):
-		"""Custom method that allows a channel string instead of a channel object"""
-		if isinstance(channel, str):
-			return super().get_message(self.get_channel(channel), message_id)
-		return super().get_message(channel, message_id)
-
-	def send_message(self, destination, content=None, *, tts=False, embed=None):
-		"""Custom method that allows a channel ID as the 'destination' parameter"""
-		if isinstance(destination, str):
-			return super().send_message(self.get_channel(destination), content, tts=tts, embed=embed)
-		return super().send_message(destination, content, tts=tts, embed=embed)
 
 	lastBjarneChoice = -1
 	last8BallChoice = -1
@@ -349,9 +299,6 @@ async def on_ready():
 @BOT.event
 async def on_member_join(member):
 	"""The 'on_member_join' event"""
-
-	# Refresh channel IDs
-	BOT.config.refresh()
 
 	# Add a temporary role that disallows access to all channels until confirming the rules
 	await member.add_roles(*list(filter(lambda r: r.name == "Didn't read the Rules", member.guild.roles)))
@@ -379,14 +326,12 @@ Type `!help` for a list of my commands.
 async def on_member_remove(member):
 	"""The 'on_member_remove' event"""
 
-	# Refresh channel IDs
-	BOT.config.refresh()
-
 	# Return if member is test user
 	if member.id == 162606144722829312:
 		return
 
-	await BOT.send_message(BOT.config["channels"]["lobby"], "User **{}** has left the server. Goodbye!".format(str(member)))
+	farewell_channel = member.guild.get_channel(412327350366240768)
+	await farewell_channel.send("User **{}** has left the server. Goodbye!".format(str(member)))
 
 @BOT.event
 async def on_message_delete(message):
@@ -397,7 +342,7 @@ async def on_message_delete(message):
 	deleted_poll = BOT.ongoing_polls[message.id]
 	deleted_poll.destroy()
 
-	await BOT.send_message(deleted_poll.initiator, "Your poll with the question `{}` in {} was deleted. Here are the results.".format(deleted_poll.question, deleted_poll.channel.mention), embed=deleted_poll.embed)
+	await deleted_poll.initiator.send("Your poll with the question `{}` in {} was deleted. Here are the results.".format(deleted_poll.question, deleted_poll.channel.mention), embed=deleted_poll.embed)
 
 @BOT.event
 async def on_raw_reaction_add(payload):
@@ -577,8 +522,8 @@ DANK_MESSAGE_MAP = [
 async def on_message(message):
 	"""The 'on_message' event handler"""
 
-	# Fetch home_server if not existant
-	if not BOT.home_server and BOT.home_server_id == message.guild.id:
+	# Fetch home_server if not existent
+	if not BOT.home_server and message.guild and BOT.home_server_id == message.guild.id:
 		BOT.home_server = message.guild
 
 	if message.author.id == BOT.user.id:
@@ -607,11 +552,11 @@ async def on_message(message):
 					if emoji:
 						await BOT.add_reaction(message, emoji)
 					else:
-						await BOT.send_message(message.channel, val)
+						await message.channel.send(val)
 				else:
-					await BOT.send_message(message.channel, val)
+					await message.channel.send(val)
 			else:
-				await BOT.send_message(message.channel, val)
+				await message.channel.send(val)
 
 		for dankness in DANK_MESSAGE_MAP:
 			key = dankness[0]
@@ -632,12 +577,12 @@ async def on_message(message):
 async def say(ctx, *something):
 	"""Make Bjarne say something."""
 	if something:
-		await ctx.send(" ".join(something))
+		await ctx.message.channel.send(" ".join(something))
 
 @BOT.command()
 async def version(ctx):
 	"""Display Bjarne version info."""
-	await ctx.send("v{} - {}".format(VERSION_NUMBER, REPOSITORY_URL))
+	await ctx.message.channel.send("v{} - {}".format(VERSION_NUMBER, REPOSITORY_URL))
 
 @BOT.command()
 async def bjarnequote(ctx):
@@ -666,7 +611,7 @@ async def bjarnequote(ctx):
 	
 	BOT.lastBjarneChoice = choice
 
-	await ctx.send(choice)
+	await ctx.message.channel.send(choice)
 
 @BOT.command()
 async def random(ctx, *arg):
@@ -690,12 +635,12 @@ async def random(ctx, *arg):
 			y = int(arg[1])
 			random_number = rand.randint(x, y)
 
-	await ctx.send(random_number)
+	await ctx.message.channel.send(random_number)
 
 @BOT.command()
 async def dice(ctx):
 	"""Roll a dice."""
-	await ctx.send(rand.randint(1, 6))
+	await ctx.message.channel.send(rand.randint(1, 6))
 
 # todo: use arguments, should make this command much simpler
 @BOT.command()
@@ -752,7 +697,7 @@ async def math(*, arg):
 		# Strip trailing 0s if we just have a whole number result
 		z = '%g' % (Decimal(str(z)))
 
-	await ctx.send(z)
+	await ctx.message.channel.send(z)
 
 @BOT.command()
 async def quote(ctx, *arg):
@@ -782,21 +727,21 @@ async def quote(ctx, *arg):
 
 	# Pick a random message and output it
 	random_message = messages[rand.randint(0, len(messages))]
-	await ctx.send("{} once said: `{}`".format(user, random_message))
+	await ctx.message.channel.send("{} once said: `{}`".format(user, random_message))
 
 @BOT.command()
 async def poll(ctx):
 	"""Starts a new poll. Usage: !poll -Question -durationInSeconds -Option -Option -Option..."""
 	args = ctx.message.content.split("-")
 	if len(args) < 2:
-		return await ctx.send("Please see the command usage for this command: `{}poll -Question -durationInSeconds -Option -Option -Option...`".format(BOT.command_prefix))
+		return await ctx.message.channel.send("Please see the command usage for this command: `{}poll -Question -durationInSeconds -Option -Option -Option...`".format(BOT.command_prefix))
 
 	question = args[1]
 	duration = args[2]
 
 	duration_float = float(duration)
 	if duration_float > 86400:
-		return await ctx.send("Poll cannot last longer than one day (86400 seconds).")
+		return await ctx.message.channel.send("Poll cannot last longer than one day (86400 seconds).")
 
 	args.pop(0)
 	args.pop(0)
@@ -853,7 +798,7 @@ async def stats(ctx):
 	embed.add_field(name="Users Total", value=numberOfUsers)
 	embed.add_field(name="Newest Member", value=newestMember)
 
-	await ctx.send(embed=embed)
+	await ctx.message.channel.send(embed=embed)
 
 
 @BOT.command()
@@ -880,13 +825,12 @@ async def urban(ctx, query):
 	embed.add_field(name="Example", value=example)
 	embed.add_field(name="URL", value=url)
 	
-	await ctx.send(embed=embed)
+	await ctx.message.channel.send(embed=embed)
 
 
 @BOT.command()
 async def report(ctx, user):
 	"""Report a user anonymously to the society committee. Usage: !report <user> <reason>"""
-	BOT.config["bot"]["channels"]["bjarne"]
 
 	reason = ctx.message.content
 	reason = reason.replace("!report " + user, "")
@@ -896,7 +840,7 @@ async def report(ctx, user):
 	message += "`" + user + "` for the reason: `"
 	message += reason + "`."
 
-	await BOT.send_message(BOT.config["bot"]["channels"]["committee"], message)
+	await BOT.get_channel(416255534438547456).send(message)
 
 
 @BOT.command()
@@ -934,9 +878,9 @@ async def eightball(ctx, *arg):
 		
 		BOT.last8BallChoice = choice
 
-		await ctx.send(choice)
+		await ctx.message.channel.send(choice)
 	else:
-		await ctx.send("You must ask a question!")
+		await ctx.message.channel.send("You must ask a question!")
 
 
 @BOT.command()
@@ -950,7 +894,7 @@ async def xkcd(ctx):
 	data = response.json()
 
 	comic = data["img"]
-	await ctx.send(comic)
+	await ctx.message.channel.send(comic)
 
 
 @BOT.command()
@@ -972,7 +916,7 @@ async def wiki(ctx):
 	embed.add_field(name="Summary", value=summary)
 	embed.add_field(name="Read More", value=URL)
 	
-	await ctx.send(embed=embed)
+	await ctx.message.channel.send(embed=embed)
 
 
 @BOT.command()
@@ -1001,7 +945,7 @@ async def translate(ctx):
 	output += tolang
 	output += ")"
 
-	await ctx.send(output)
+	await ctx.message.channel.send(output)
 
 
 def cryptoChange(val):
@@ -1055,7 +999,7 @@ async def crypto(ctx, *symbol):
 			if x.find(str(symbol[0].upper())) >= 0:
 				output = x
 
-	await ctx.send(output)
+	await ctx.message.channel.send(output)
 
 
 @BOT.command()
@@ -1161,7 +1105,7 @@ async def convert(ctx, value: float, fromUnit, toUnit):
 		message += " "
 		message += toUnit
 
-	await ctx.send(message)
+	await ctx.message.channel.send(message)
 
 
 @BOT.command()
@@ -1184,7 +1128,7 @@ async def modules(ctx, course):
 			message += str(len(x[1][1])) + " votes)"
 			message += "\n"
 
-	await ctx.send(message)
+	await ctx.message.channel.send(message)
 
 
 
@@ -1235,7 +1179,7 @@ async def ratemodule(ctx, *arg):
 				json.dump(data, outfile)
 
 
-	await ctx.send(message)
+	await ctx.message.channel.send(message)
 
 
 @BOT.command()
@@ -1251,7 +1195,7 @@ async def ask(ctx):
 
 	query = next(res.results).text
 
-	await ctx.send(query)
+	await ctx.message.channel.send(query)
 
 
 ##### [ BOT LOGIN ] #####
