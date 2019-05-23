@@ -79,15 +79,14 @@ class HangmanGame:
     """The class that manages a game of 'Hangman'"""
     def __init__(self, ctx, *, bot):
         self.bot = bot
-        self.channel_id = ctx.message.channel.id
+        self.channel = ctx.message.channel
         self.message = None
         self.word = random.choice(HANGMAN_WORDS).upper()
         self.stage = 0
         self.guessed = []
 
         # Set up the embed template
-        self.embed = discord.Embed(colour=utils.generate_random_colour())
-        self.embed.timestamp = ctx.message.timestamp
+        self.embed = discord.Embed(colour=utils.generate_random_colour(), timestamp=ctx.message.created_at)
         self.embed.description = "It's Hangman! Guess the word procedurally by typing in a letter - but beware! The more incorrect letters guessed, the more complete the hangman will become. Once the hangman is fully complete, everyone loses."
         self.embed.set_author(name="Hangman")
         self.embed.set_footer(text="Initiated by {}".format(str(ctx.message.author)))
@@ -98,7 +97,7 @@ class HangmanGame:
 
     async def start(self):
         """Starts the game"""
-        self.message = await self.bot.send_message(self.channel_id, embed=self.embed)
+        self.message = await self.channel.send(embed=self.embed)
 
     async def process_message(self, msg):
         """Processes the message and declares the main logic flow"""
@@ -110,7 +109,7 @@ class HangmanGame:
             self.guessed.append(msg.content.upper())
 
         await self.update_message(msg, limb_add)
-        await self.bot.delete_message(msg)
+        await msg.delete()
 
     async def update_message(self, user_message, limb_add):
         """Updates a message (with hangman image) in response to a received letter"""
@@ -134,7 +133,7 @@ class HangmanGame:
         embed.add_field(name="Guessed Letters", value="**`{}`**".format("`**, **`".join(self.guessed)), inline=False)
         embed.add_field(name="Hangman", value=HANGMAN_STAGES[self.stage], inline=False)
 
-        await self.bot.edit_message(self.message, embed=embed)
+        await self.message.edit(embed=embed)
 
     async def finish(self, user_message, win):
         """Finishes the game and deletes the instance"""
@@ -155,8 +154,8 @@ class HangmanGame:
         embed.add_field(name="Guessed Letters", value="**`{}`**".format("`**, **`".join(self.guessed)), inline=False)
         embed.add_field(name="Hangman", value=HANGMAN_STAGES[self.stage])
 
-        del self.bot.hangman_games[self.channel_id]
-        await self.bot.edit_message(self.message, embed=embed)
+        del self.bot.hangman_games[self.channel.id]
+        await self.message.edit(embed=embed)
 
 class Hangman(commands.Cog):
     """The `Hangman` class"""
