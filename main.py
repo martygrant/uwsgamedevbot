@@ -30,7 +30,7 @@ from forex_python.converter import CurrencyRates
 import wolframalpha
 
 import utilities as utils
-import modules.weather
+# import modules.weather
 import modules.hangman
 
 REPOSITORY_URL = "https://github.com/martygrant/uwsgamedevbot"
@@ -38,6 +38,8 @@ VERSION_NUMBER = os.getenv('version')
 BOT_TOKEN = os.getenv('token')
 GIPHY_TOKEN = os.getenv('giphy')
 WOLFRAM_KEY = "42XXHU-YEK7852REU"
+
+DEVELOPERS = [ 129036763367735297, 317284059275460608 ]
 
 true = True
 false = False
@@ -284,7 +286,7 @@ class CustomBot(commands.Bot):
 ##### [ BOT INSTANTIATION ] #####
 
 BOT = CustomBot(description="Below is a listing for Bjarne's commands. Use '!' infront of any of them to execute a command, like '!help'", command_prefix="!", home_server_id="405451738804518916")
-BOT.load_extension('modules.weather')
+# BOT.load_extension('modules.weather')
 BOT.load_extension('modules.hangman')
 BOT.load_extension('modules.dictionary')
 
@@ -572,6 +574,20 @@ async def on_message(message):
 					break
 
 ##### [ BOT COMMANDS ] #####
+
+@BOT.command()
+async def evaluate(ctx, *expression):
+	"""Evaluate an expression."""
+	if ctx.message.author.id not in DEVELOPERS:
+		return await ctx.message.channel.send("Wait, you're not a developer. Don't try anything.")
+
+	result = None
+	try:
+		result = eval(' '.join(expression))
+	except Exception as error:
+		result = error
+
+	await ctx.message.channel.send(result)
 
 @BOT.command()
 async def say(ctx, *something):
