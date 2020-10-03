@@ -1,4 +1,4 @@
-# Bjarne 
+# Bjarne
 
 Bjarne is a Discord server bot built for and maintained by the UWS Game Dev Society.
 
@@ -6,26 +6,68 @@ It is written in Python using [discord.py](https://github.com/Rapptz/discord.py)
 
 It is currently hosted on the Heroku cloud platform.
 
-## Contributing
-If you are a member of the society and wish to add features, enhancements or fix bugs your contribution is welcome!
+### Requirements
+* Python 3.4.2+
+* [discord.py](https://github.com/Rapptz/discord.py)
+* [requests](https://pypi.org/project/requests/)
+* [wikipedia](https://github.com/goldsmith/Wikipedia)
 
-Feel free to choose an item on the [Issues page](https://github.com/martygrant/uwsgamedevbot/issues) section that you would like to work on. Already implemented features are [listed below](https://github.com/martygrant/uwsgamedevbot#features).
+### Contributors
+* [Medallyon](https://github.medallyon.me/)
+
+## Contributing
+If you are a member of the society and wish to add features, enhancements, or fix bugs, your contribution is welcome!
+
+Feel free to choose an item on the [Issues page](https://github.com/martygrant/uwsgamedevbot/issues) section that you would like to work on. Already implemented features are [listed below](#features).
 
 To get started you should get the example running from the [discord.py repo](https://github.com/Rapptz/discord.py) and check out the documentation there. For a more in-depth tutorial there is a really handy [Discord server](https://discord.gg/GWdhBSp) with guides for basic operations.
 
 For developing the bot you should create your own bot and run it in your own private server to test out your functions so we can avoid a lot of bother with security tokens and the Bjarne bot being hosted in a cloud server. Once you are happy you can submit a pull request and it can be added to Bjarne.
 
-If you have any questions for making a contribution, or a code related question for your change you can message @midnightpacific in the Discord server.
+If you have any questions for making a contribution, or a code related question, feel free to send a message in the `#bjarne-dev` channel on the society server.
 
-### Requirements
-* Python 3.4.2+
-* [discord.py](https://github.com/Rapptz/discord.py)
-* [weather-api](https://pypi.org/project/weather-api/)
-* [requests](https://pypi.org/project/requests/)
-* [wikipedia](https://github.com/goldsmith/Wikipedia)
+## Installation
 
-### Contributors
-* [Medallyon](https://github.com/Medallyon)
+[Fork this repo](https://github.com/martygrant/uwsgamedevbot/fork) and clone your fork to get it onto your computer. Make sure you have [`git`](https://git-scm.com/) installed before you do this.
+
+```bash
+git clone https://github.com/<YOUR_GITHUB_USERNAME>/uwsgamedevbot.git
+```
+
+Install any dependencies you may need:
+
+```bash
+pip install -r requirements.txt
+```
+
+Set up your environment:
+
+1. Create a new file in the root of the repo directory called `.env`
+  1. If you struggle doing this on Windows, you can just open a text editor window and do `Save As...`, then save it into the root of your project folder.
+1. Paste the following text into that file, then save it:
+
+```bash
+VERSION=0.5
+
+# Replace this with your development bot token from https://discord.com/developers/applications
+BOT_TOKEN=
+
+GIPHY_TOKEN=DJMTKL6KeslYSHAY0S0ts7psxsUixP0S
+WOLFRAM_TOKEN=42XXHU-YEK7852REU
+```
+*Some 3rd-Party tokens have been provided for the sake of ease. They are working, but please don't abuse them. In production, different tokens will be used.*
+
+1. (Recommended) Create a development server on Discord for local testing purposes.
+1. Create a developer application on the [Discord Applications](https://discord.com/developers/applications) page.
+1. Convert it into a `BOT` by clicking the very obvious button that appears on the following page.
+1. Navigate to the **OAuth2** tab on the left sidebar
+  1. Scroll down and check the `bot` entry in the **SCOPES** section.
+  1. Follow the link that is generated in the text field below and invite the bot into the server you created in step 1.
+  1. The bot will appear as offline, which is fine, since we haven't started the application yet!
+1. Navigate to the **Bot** tab on the left sidebar.
+  1. Copy the `Bot Token` and paste it into the `BOT_TOKEN` entry from the `.env` file you created earlier.
+1. Now you can run `python main.py` and the bot should be up and running. Feel free to make any changes to the code and restart the bot to see the effects. Once you are satisfied with your changes, push it to your fork, and create a pull request!
+  1. **NOTE: As of the time of this writing, the bot may be completely broken and may simply spew errors. This is most likely a dependency issue and is being looked into. If you feel adventurous, please have a look and see if you can get it up and running yourself. That would be a huge help!**
 
 ## Features
 * Automatic new member welcome message.
