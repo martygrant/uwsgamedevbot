@@ -8,6 +8,10 @@
 #
 #####
 
+# import any applicable env_vars from '/.env'
+from dotenv import load_dotenv
+load_dotenv()
+
 import os
 from pathlib import Path
 import random as rand
@@ -34,10 +38,10 @@ import utilities as utils
 import modules.hangman
 
 REPOSITORY_URL = "https://github.com/martygrant/uwsgamedevbot"
-VERSION_NUMBER = os.getenv('version')
-BOT_TOKEN = os.getenv('token')
-GIPHY_TOKEN = os.getenv('giphy')
-WOLFRAM_KEY = "42XXHU-YEK7852REU"
+VERSION_NUMBER = os.getenv("VERSION")
+BOT_TOKEN = os.getenv("BOT_TOKEN")
+GIPHY_TOKEN = os.getenv("GIPHY_TOKEN")
+WOLFRAM_KEY = os.getenv("WOLFRAM_TOKEN")
 
 DEVELOPERS = [ 129036763367735297, 317284059275460608 ]
 
