@@ -1,4 +1,4 @@
-dotenv
+python-dotenv
 discord.py==1.1.1
 requests
 wikipedia
