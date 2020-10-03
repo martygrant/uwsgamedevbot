@@ -1,8 +1,7 @@
-python-dotenv
+wolframalpha==4.0.0
+translate==3.5.0
 discord.py==1.1.1
-requests
-wikipedia
-translate
-coinmarketcap
-forex-python
-wolframalpha
+coinmarketcap==5.0.3
+forex_python==1.5
+requests==2.24.0
+python-dotenv==0.14.0
