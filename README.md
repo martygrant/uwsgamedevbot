@@ -43,7 +43,7 @@ pip install -r requirements.txt
 Set up your environment:
 
 1. Create a new file in the root of the repo directory called `.env`
-    1. If you struggle doing this on Windows, you can just open a text editor window and do `Save As...`, then save it into the root of your project folder.
+    1. If you struggle doing this on Windows, you can just open a text editor window and do `Save As...`, then save it into the root of your project folder with the name `.env`.
 1. Paste the following text into that file, then save it:
 
 ```bash
@@ -67,7 +67,6 @@ WOLFRAM_TOKEN=42XXHU-YEK7852REU
 1. Navigate to the **Bot** tab on the left sidebar.
     1. Copy the `Bot Token` and paste it into the `BOT_TOKEN` entry from the `.env` file you created earlier.
 1. Now you can run `python main.py` and the bot should be up and running. Feel free to make any changes to the code and restart the bot to see the effects. Once you are satisfied with your changes, push it to your fork, and create a pull request!
-    1. **NOTE: As of the time of this writing, the bot may be completely broken and may simply spew errors. This is most likely a dependency issue and is being looked into. If you feel adventurous, please have a look and see if you can get it up and running yourself. That would be a huge help!**
 
 ## Features
 * Automatic new member welcome message.
