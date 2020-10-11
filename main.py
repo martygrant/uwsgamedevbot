@@ -293,6 +293,7 @@ BOT = CustomBot(description="Below is a listing for Bjarne's commands. Use '!' i
 # BOT.load_extension('modules.weather')
 BOT.load_extension('modules.hangman')
 BOT.load_extension('modules.dictionary')
+BOT.load_extension('modules.gameDevDictionary')
 
 ##### [ EVENT LISTENERS ] #####
 
