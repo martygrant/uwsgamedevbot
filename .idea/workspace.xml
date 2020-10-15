@@ -25,7 +25,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0cb14ebd-931c-43ea-b792-d926f8320ed8" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/modules/gameDevDictionary.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/gameDevDictionary.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -93,7 +94,7 @@
       <workItem from="1602247871903" duration="6309000" />
       <workItem from="1602335706636" duration="3022000" />
       <workItem from="1602421569853" duration="7714000" />
-      <workItem from="1602781112720" duration="1663000" />
+      <workItem from="1602781112720" duration="2296000" />
     </task>
     <servers />
   </component>
