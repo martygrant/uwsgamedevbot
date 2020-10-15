@@ -15,8 +15,8 @@ class GameDevDictionary(commands.Cog):
     async def test(self, ctx):
         await ctx.send('Dictionary Test Working')
 
-    @commands.command(pass_context=True, name='Dinfo')
-    async def Dinfo(self, ctx):
+    @commands.command(pass_context=True, name='Info')
+    async def DInfo(self, ctx):
         await ctx.send('Game Development Dictionary \n'
                        'this module allows you to put in terms related to game dev and get more information and resources \n'
                        'for example !Unity would pull up links related to Unity \n '
