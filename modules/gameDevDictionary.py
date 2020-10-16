@@ -41,6 +41,7 @@ class GameDevDictionary(commands.Cog):
                        'industry news | <https://www.gamesindustry.biz/> \n'
                        'news software/tools | <https://gamefromscratch.com/>')
 
+
     @commands.command(pass_context=True, name='Unity')
     async def Unity(self,ctx):
         await ctx.send('Unity \n'
@@ -48,6 +49,7 @@ class GameDevDictionary(commands.Cog):
                         'unity documentation| <https://docs.unity3d.com/Manual/index.html> \n'
                         'unity forums | <https://answers.unity.com/index.html> \n'
                         'unity reddit | <https://www.reddit.com/r/Unity3D/>')
+
 
     @commands.command(pass_context=True, name='Unreal')
     async def Unreal(self, ctx):
@@ -65,6 +67,7 @@ class GameDevDictionary(commands.Cog):
                        'Godot documentation| <https://docs.godotengine.org/en/stable/index.html> \n'
                        'Reddit Godot| <https://www.reddit.com/r/godot/>')
 
+
     @commands.command(pass_context=True, name='Art')
     async def Art(self, ctx):
         await ctx.send('General game Art /n'
@@ -76,6 +79,7 @@ class GameDevDictionary(commands.Cog):
                        'flipped normals| <https://flippednormals.com/> \n'
                        'collab drawing program| <https://magmastudio.io/>')
 
+
     @commands.command(pass_context=True, name='Programming')
     async def Programming(self, ctx):
         await ctx.send('General programming resources \n'
@@ -86,6 +90,7 @@ class GameDevDictionary(commands.Cog):
                        'c# book| <https://www.amazon.co.uk/Beginning-Programming-Premier-Development-Paperback/dp/1592005179> \n'
                        'Beginning C++ Through Game Programming by Michael Dawson| <https://www.amazon.com/gp/product/B011T6YIGK/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=B011T6YIGK&linkCode=as2&tag=compubookstut-20&linkId=4457fe1663d015ec863b587857a5920d>')
 
+
     @commands.command(pass_context=True, name='Audio')
     async def Audio(self, ctx):
         await ctx.send('Audio resources \n'
@@ -93,6 +98,7 @@ class GameDevDictionary(commands.Cog):
                        '| <https://www.gamedevmarket.net/category/audio/sound-fx/> \n'
                        '| <https://www.gamasutra.com/blogs/PavelShylenok/20190506/342095/Designing_Sounds_for_a_Game.php> \n'
                        '| <https://www.gamedesigning.org/learn/video-game-sound/>')
+
 
     @commands.command(pass_context=True, name='Shaders')
     async def Shaders(self, ctx):

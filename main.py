@@ -290,7 +290,6 @@ class CustomBot(commands.Bot):
 ##### [ BOT INSTANTIATION ] #####
 
 BOT = CustomBot(description="Below is a listing for Bjarne's commands. Use '!' infront of any of them to execute a command, like '!help'", command_prefix="!", home_server_id="405451738804518916")
-# BOT.load_extension('modules.weather')
 BOT.load_extension('modules.hangman')
 BOT.load_extension('modules.dictionary')
 BOT.load_extension('modules.gameDevDictionary')
@@ -307,38 +306,10 @@ async def on_ready():
 async def on_member_join(member):
 	"""The 'on_member_join' event"""
 
-	# Add a temporary role that disallows access to all channels until confirming the rules
-	await member.add_roles(*list(filter(lambda r: r.name == "Didn't read the Rules", member.guild.roles)))
-
-	welcome_message = """Welcome to the **UWS Game Development Society**!
-
-Please review the rules in the <#579342050156347392> channel. When you're done, simply click on the :ok_hand: emoji right below the message. This will give you access to a lot more channels.
-
-Type `!help` for a list of my commands.
-
-"""
+	welcome_message = """Welcome to the **UWS Game Development Society**! Please review the rules in the <#579342050156347392> channel. Otherwise, type `!help` for a list of my commands."""
 
 	# Send the welcome message to the user individually
 	await member.send(welcome_message)
-
-	# Return if member is test user
-	if member.id == 162606144722829312:
-		return
-
-	# Announce a new member joining in the lobby channel
-	welcome_channel = member.guild.get_channel(412327350366240768)
-	await welcome_channel.send("Welcome {} to the UWS Game Dev Society!".format(member.mention))
-
-@BOT.event
-async def on_member_remove(member):
-	"""The 'on_member_remove' event"""
-
-	# Return if member is test user
-	if member.id == 162606144722829312:
-		return
-
-	farewell_channel = member.guild.get_channel(412327350366240768)
-	await farewell_channel.send("User **{}** has left the server. Goodbye!".format(str(member)))
 
 @BOT.event
 async def on_message_delete(message):
@@ -350,134 +321,6 @@ async def on_message_delete(message):
 	deleted_poll.destroy()
 
 	await deleted_poll.initiator.send("Your poll with the question `{}` in {} was deleted. Here are the results.".format(deleted_poll.question, deleted_poll.channel.mention), embed=deleted_poll.embed)
-
-@BOT.event
-async def on_raw_reaction_add(payload):
-	"""The 'on_raw_reaction_add' event"""
-
-	if payload.user_id == BOT.user.id:
-		return
-
-	if payload.channel_id not in [579342050156347392, 579308807453409280]:
-		return
-
-	# Fetch reactor Message and Member objects
-	message = await BOT.get_channel(payload.channel_id).fetch_message(payload.message_id)
-	if payload.user_id in list(map(lambda m: m.id, message.guild.members)):
-		member = message.guild.get_member(payload.user_id)
-	else:
-		member = await message.guild.fetch_member(payload.user_id)
-
-	if any(obj is None for obj in (message, message.guild, member)):
-		return
-
-	if message.guild.id != 405451738804518916:
-		return
-
-	uws_roles = None
-	selected_option = None
-	delete_other_roles = False
-
-	# Reaction is for rules confirmation message
-	if message.id == 579342665368338441:
-		if payload.emoji.name == "👌":
-			await member.remove_roles(*list(filter(lambda r: r.name == "Didn't read the Rules", member.guild.roles)))
-			await member.send("**==============================================\nThanks for taking the time to read through our rules**. You can now add roles/tags to your profile by heading over to the <#579308807453409280> channel, which is recommended as you'll get access to course-specific channels and allows other members of the server to see what courses you are in.\n\nYou can always review the rules and add/remove any roles by re-visiting <#579308807453409280>.\n\nOnce you've done that, please change your server nickname to your real name or an abbreviation of your name. Make sure to visit <#405737395477020682> to see what events are coming up? Maybe introduce yourself in <#413835267557031937>!")
-		return
-
-	# Reaction is for 'Level of Study' Role Selection
-	elif message.id == 579331851899109387:
-		if any(payload.emoji.name == emoji for emoji in utils.NUMBER_EMOJIS):
-			selected_option = utils.NUMBER_EMOJIS.index(payload.emoji.name)
-			uws_roles = ["1st Year", "2nd Year", "3rd Year", "4th Year", "PhD", "Graduate"]
-			delete_other_roles = True
-
-	# Reaction is for 'Course' Role Selection
-	elif message.id == 579332663312121886:
-		if any(payload.emoji.name == emoji for emoji in utils.NUMBER_EMOJIS):
-			selected_option = utils.NUMBER_EMOJIS.index(payload.emoji.name)
-			uws_roles = ["Computer Animation Arts", "Computer Games (Art and Animation)", "Computer Games Development", "Computer Games Technology", "Computer Science", "Digital Art & Design", "Ecology", "Information Technology", "Web and Mobile Development"]
-			delete_other_roles = True
-
-	# Reaction is for 'Institution' Role Selection
-	elif message.id == 579333086018535424:
-		if any(payload.emoji.name == emoji for emoji in utils.NUMBER_EMOJIS):
-			selected_option = utils.NUMBER_EMOJIS.index(payload.emoji.name)
-			uws_roles = ["University of the West of Scotland", "West College Scotland", "Abertay University", "Glasgow Caledonian University", "Strathclyde University"]
-
-	# Reaction is for 'Other' Role Selection
-	elif message.id == 579333442089779204:
-		if any(payload.emoji.name == emoji for emoji in utils.NUMBER_EMOJIS):
-			selected_option = utils.NUMBER_EMOJIS.index(payload.emoji.name)
-			uws_roles = ["Bjarne Development", "HNC", "HND"]
-
-	else:
-		return
-
-	if selected_option >= 0 and uws_roles:
-		await member.add_roles(*list(filter(lambda r: r.name == uws_roles[selected_option], member.guild.roles)))
-		if delete_other_roles:
-			roles_to_delete = list(filter(lambda r: r.name in uws_roles and r.name != uws_roles[selected_option], member.roles))
-			await member.remove_roles(*roles_to_delete)
-			for r in roles_to_delete:
-				reaction_to_delete = utils.NUMBER_EMOJIS[uws_roles.index(r.name)]
-				await message.remove_reaction(reaction_to_delete, member)
-
-@BOT.event
-async def on_raw_reaction_remove(payload):
-	"""The 'on_raw_reaction_remove' event"""
-
-	if payload.user_id == BOT.user.id:
-		return
-
-	if payload.channel_id not in [579342050156347392, 579308807453409280]:
-		return
-
-	# Fetch reactor Message and Member objects
-	message = await BOT.get_channel(payload.channel_id).fetch_message(payload.message_id)
-	if payload.user_id in list(map(lambda m: m.id, message.guild.members)):
-		member = message.guild.get_member(payload.user_id)
-	else:
-		member = await message.guild.fetch_member(payload.user_id)
-
-	if any(obj is None for obj in (message, message.guild, member)):
-		return
-
-	if message.guild.id != 405451738804518916:
-		return
-
-	uws_roles = None
-	selected_option = None
-
-	# Reaction is for 'Level of Study' Role Selection
-	if message.id == 579331851899109387:
-		if any(emoji == payload.emoji.name for emoji in utils.NUMBER_EMOJIS):
-			selected_option = utils.NUMBER_EMOJIS.index(payload.emoji.name)
-			uws_roles = ["1st Year", "2nd Year", "3rd Year", "4th Year", "PhD", "Graduate"]
-
-	# Reaction is for 'Course' Role Selection
-	elif message.id == 579332663312121886:
-		if any(emoji == payload.emoji.name for emoji in utils.NUMBER_EMOJIS):
-			selected_option = utils.NUMBER_EMOJIS.index(payload.emoji.name)
-			uws_roles = ["Computer Animation Arts", "Computer Games (Art and Animation)", "Computer Games Development", "Computer Games Technology", "Computer Science", "Digital Art & Design", "Ecology", "Information Technology", "Web and Mobile Development"]
-
-	# Reaction is for 'Institution' Role Selection
-	elif message.id == 579333086018535424:
-		if any(emoji == payload.emoji.name for emoji in utils.NUMBER_EMOJIS):
-			selected_option = utils.NUMBER_EMOJIS.index(payload.emoji.name)
-			uws_roles = ["University of the West of Scotland", "West College Scotland", "Abertay University", "Glasgow Caledonian University", "Strathclyde University"]
-
-	# Reaction is for 'Other' Role Selection
-	elif message.id == 579333442089779204:
-		if any(emoji == payload.emoji.name for emoji in utils.NUMBER_EMOJIS):
-			selected_option = utils.NUMBER_EMOJIS.index(payload.emoji.name)
-			uws_roles = ["Bjarne Development", "HNC", "HND"]
-
-	else:
-		return
-
-	if selected_option >= 0 and uws_roles:
-		await member.remove_roles(*list(filter(lambda r: r.name == uws_roles[selected_option], member.guild.roles)))
 
 @BOT.event
 async def on_reaction_add(reaction, user):
@@ -778,9 +621,6 @@ async def poll(ctx):
 	new_poll = Poll(question, options, timestamp(), duration_float, ctx.message.author, ctx.message.channel)
 	await new_poll.start()
 
-
-
-
 def getOnlineUserCount(users):
 	count = 0
 	for user in users:
@@ -798,7 +638,6 @@ def getNewestMember(users):
 			newest = x
 
 	return newest
-
 
 @BOT.command()
 async def stats(ctx):
@@ -820,7 +659,6 @@ async def stats(ctx):
 	embed.add_field(name="Newest Member", value=newestMember)
 
 	await ctx.message.channel.send(embed=embed)
-
 
 @BOT.command()
 async def urban(ctx, query):
@@ -848,7 +686,6 @@ async def urban(ctx, query):
 	
 	await ctx.message.channel.send(embed=embed)
 
-
 @BOT.command()
 async def report(ctx, user):
 	"""Report a user anonymously to the society committee. Usage: !report <user> <reason>"""
@@ -862,7 +699,6 @@ async def report(ctx, user):
 	message += reason + "`."
 
 	await BOT.get_channel(416255534438547456).send(message)
-
 
 @BOT.command()
 async def eightball(ctx, *arg):
@@ -903,7 +739,6 @@ async def eightball(ctx, *arg):
 	else:
 		await ctx.message.channel.send("You must ask a question!")
 
-
 @BOT.command()
 async def xkcd(ctx):
 	"""Get a random XKCD comic."""
@@ -916,7 +751,6 @@ async def xkcd(ctx):
 
 	comic = data["img"]
 	await ctx.message.channel.send(comic)
-
 
 @BOT.command()
 async def wiki(ctx):
@@ -938,7 +772,6 @@ async def wiki(ctx):
 	embed.add_field(name="Read More", value=URL)
 	
 	await ctx.message.channel.send(embed=embed)
-
 
 @BOT.command()
 async def translate(ctx):
@@ -967,7 +800,6 @@ async def translate(ctx):
 	output += ")"
 
 	await ctx.message.channel.send(output)
-
 
 def cryptoChange(val):
 	if (val > 0):
@@ -1021,7 +853,6 @@ async def crypto(ctx, *symbol):
 				output = x
 
 	await ctx.message.channel.send(output)
-
 
 @BOT.command()
 async def convert(ctx, value: float, fromUnit, toUnit):
@@ -1128,7 +959,6 @@ async def convert(ctx, value: float, fromUnit, toUnit):
 
 	await ctx.message.channel.send(message)
 
-
 @BOT.command()
 async def modules(ctx, course):
 	"""Display course module ratings. Options are: CGT, CGD."""
@@ -1150,8 +980,6 @@ async def modules(ctx, course):
 			message += "\n"
 
 	await ctx.message.channel.send(message)
-
-
 
 @BOT.command()
 async def ratemodule(ctx, *arg):
@@ -1202,7 +1030,6 @@ async def ratemodule(ctx, *arg):
 
 	await ctx.message.channel.send(message)
 
-
 @BOT.command()
 async def ask(ctx):
 	"""Submit a question to Wolfram Alpha."""
@@ -1217,7 +1044,6 @@ async def ask(ctx):
 	query = next(res.results).text
 
 	await ctx.message.channel.send(query)
-
 
 ##### [ BOT LOGIN ] #####
 
