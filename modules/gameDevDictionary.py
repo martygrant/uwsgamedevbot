@@ -17,7 +17,7 @@ class GameDevDictionary(commands.Cog):
 
     @commands.command(pass_context=True, name='Info')
     async def DInfo(self, ctx):
-        await ctx.send('Game Development Dictionary \n'
+        await ctx.send('**Game Development Dictionary** \n'
                        'this module allows you to put in terms related to game dev and get more information and resources \n'
                        'for example !Unity would pull up links related to Unity \n '
                        'current terms in the dictionary\n'
@@ -32,7 +32,7 @@ class GameDevDictionary(commands.Cog):
 
     @commands.command(pass_context=True, name='General')
     async def GeneralInfo(self, ctx):
-        await ctx.send('General game Development Resources \n' 
+        await ctx.send('**General game Development Resources** \n' 
                        'Game Dev Data base| <https://gamedevelop.io/resources>\n'
                        ' GDC Vault|<https://www.gdcvault.com/free>\n'
                        ' reddit | <https://www.reddit.com/r/gamedev/> \n'
@@ -43,7 +43,7 @@ class GameDevDictionary(commands.Cog):
 
     @commands.command(pass_context=True, name='Unity')
     async def Unity(self,ctx):
-        await ctx.send('Unity \n'
+        await ctx.send('**Unity** \n'
                         'Unity learning website| <https://learn.unity.com/> \n'
                         'unity documentation| <https://docs.unity3d.com/Manual/index.html> \n'
                         'unity forums | <https://answers.unity.com/index.html> \n'
@@ -51,7 +51,7 @@ class GameDevDictionary(commands.Cog):
 
     @commands.command(pass_context=True, name='Unreal')
     async def Unreal(self, ctx):
-        await ctx.send('Unreal \n '
+        await ctx.send('**Unreal** \n '
                        'Unreal learning site | <https://www.unrealengine.com/en-US/onlinelearning-courses?sessionInvalidated=true> \n'
                        'Unreal Engine Docuumentation | <https://docs.unrealengine.com/en-US/index.html> \n'
                        'Unreal engine Reddit | <https://www.reddit.com/r/unrealengine/> \n'
@@ -60,14 +60,14 @@ class GameDevDictionary(commands.Cog):
 
     @commands.command(pass_context=True, name='Godot')
     async def Godot(self, ctx):
-        await ctx.send('Godot \n'
+        await ctx.send('**Godot** \n'
                        'godot website | <https://godotengine.org/> \n'
                        'Godot documentation| <https://docs.godotengine.org/en/stable/index.html> \n'
                        'Reddit Godot| <https://www.reddit.com/r/godot/>')
 
     @commands.command(pass_context=True, name='Art')
     async def Art(self, ctx):
-        await ctx.send('General game Art /n'
+        await ctx.send('**General game Art** /n'
                        'massive art resource page| <https://www.notion.so/The-Empire-Command-3a3bf979f8df4ca2a49315bc0dc31f9f> \n'
                        ' artstation learning| <https://www.artstation.com/learning> \n'
                        'Art news site| <https://80.lv/> \n'
@@ -78,7 +78,7 @@ class GameDevDictionary(commands.Cog):
 
     @commands.command(pass_context=True, name='Programming')
     async def Programming(self, ctx):
-        await ctx.send('General programming resources \n'
+        await ctx.send('**General programming resources** \n'
                        'Programming patterns| <http://gameprogrammingpatterns.com/contents.html> \n'
                        'Infallible Code | <https://www.youtube.com/channel/UCTjnCCcuIbrprhOiaDJxxHA> \n'
                        'General programming resources books and some general game dev books| <https://eliasdaler.github.io/programming-and-gamedev-resources/> \n'
@@ -88,7 +88,7 @@ class GameDevDictionary(commands.Cog):
 
     @commands.command(pass_context=True, name='Audio')
     async def Audio(self, ctx):
-        await ctx.send('Audio resources \n'
+        await ctx.send('**Audio resources** \n'
                        '| <https://www.reddit.com/r/GameAudio/wiki/resources?utm_source=reddit&utm_medium=usertext&utm_name=GameAudio&utm_content=t5_2scqj#/button/c/purple/> \n'
                        '| <https://www.gamedevmarket.net/category/audio/sound-fx/> \n'
                        '| <https://www.gamasutra.com/blogs/PavelShylenok/20190506/342095/Designing_Sounds_for_a_Game.php> \n'
@@ -96,7 +96,7 @@ class GameDevDictionary(commands.Cog):
 
     @commands.command(pass_context=True, name='Shaders')
     async def Shaders(self, ctx):
-        await ctx.send('Shaders resources \n'
+        await ctx.send('**Shaders resources** \n'
                        'book of shaders| <http://thebookofshaders.com> \n'
                        'Shader resource archive| <http://halisavakis.com/archive/> \n'
                        'shaderlab | <http://www.shaderslab.com/>')
