@@ -1,11 +1,15 @@
 import discord
+import json
 from discord.ext import commands
-
 
 class GameDevDictionary(commands.Cog):
     """The `GameDevDictionary` class"""
     def __init__(self, bot):
         self.bot = bot
+
+        self.data = {}
+        with open('../tutorials.json') as f:
+            self.data = json.load(f)
 
     @commands.command(pass_context=True)
     async def tutorials(self, ctx):
@@ -14,7 +18,7 @@ class GameDevDictionary(commands.Cog):
 
     @commands.command(pass_context=True, name='DictionaryTest')
     async def test(self, ctx):
-        await ctx.send('Dictionary Test Working')
+        await ctx.send(self.data.general[0].value)
 
     @commands.command(pass_context=True, name='Info')
     async def DInfo(self, ctx):
