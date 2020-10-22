@@ -37,23 +37,23 @@ class GameDevDictionary(commands.Cog):
     async def GeneralInfo(self, ctx):
         channel = ctx.message.channel
         embed = discord.Embed(title="Global", description="General Games Development Resources ", color=0x282d86)
-        embed.add_field(name="Game Dev Data base", value="https://gamedevelop.io/resources", inline=False)
-        embed.add_field(name="GDC Vault", value="https://www.gdcvault.com/free", inline=False)
-        embed.add_field(name="reddit Games development", value="https://www.reddit.com/r/gamedev/", inline=False)
-        embed.add_field(name="learn anything general resource", value="https://learn-anything.xyz", inline=False)
-        embed.add_field(name="more resources", value="https://www.gamedev.net/", inline=False)
-        embed.add_field(name="industry news", value="https://www.gamesindustry.biz/", inline=False)
-        embed.add_field(name="news software/tools", value="https://gamefromscratch.com/", inline=False)
+        embed.add_field(name="Game Dev Data base", value="[Link](https://gamedevelop.io/resources)", inline=False)
+        embed.add_field(name="GDC Vault", value="[gdc vault link](https://www.gdcvault.com/free)", inline=False)
+        embed.add_field(name="reddit Games development", value="[R/gamedev](https://www.reddit.com/r/gamedev/)", inline=False)
+        embed.add_field(name="learn anything general resource", value="[learn anything](https://learn-anything.xyz)", inline=False)
+        embed.add_field(name="more resources", value="[gamedev.net](https://www.gamedev.net/)", inline=False)
+        embed.add_field(name="industry news", value="[game industry Biz](https://www.gamesindustry.biz/)", inline=False)
+        embed.add_field(name="news software/tools", value="[Games From Scratch](https://gamefromscratch.com/)", inline=False)
         await ctx.send(channel, embed=embed)
 
     @commands.command(pass_context=True, name='Unity')
     async def Unity(self,ctx):
         channel = ctx.message.channel
         embed = discord.Embed(title="Unity", description="Unity resources ", color=0x000000)
-        embed.add_field(name="Unity learning website", value="https://learn.unity.com/", inline=False)
-        embed.add_field(name="unity documentation", value="https://docs.unity3d.com/Manual/index.html", inline=False)
-        embed.add_field(name="unity forums", value="https://answers.unity.com/index.html", inline=False)
-        embed.add_field(name="unity reddit", value="https://www.reddit.com/r/Unity3D/", inline=False)
+        embed.add_field(name="Unity learning website", value="[Unity Learn](https://learn.unity.com/)", inline=False)
+        embed.add_field(name="unity documentation", value="[Unity docs](https://docs.unity3d.com/Manual/index.html)", inline=False)
+        embed.add_field(name="unity forums", value="[Forums](https://answers.unity.com/index.html)", inline=False)
+        embed.add_field(name="unity reddit", value="[R/unity](https://www.reddit.com/r/Unity3D/)", inline=False)
         await ctx.send(channel, embed=embed)
 
     @commands.command(pass_context=True, name='Unreal')
@@ -61,23 +61,23 @@ class GameDevDictionary(commands.Cog):
         channel = ctx.message.channel
         embed = discord.Embed(title="Unreal Engine", description="Unreal Engine resources", color=0xdea309)
         embed.add_field(name="Unreal learning site",
-                        value="https://www.unrealengine.com/en-US/onlinelearning-courses?sessionInvalidated=true",
+                        value="[Unreal Learn](https://www.unrealengine.com/en-US/onlinelearning-courses?sessionInvalidated=true)",
                         inline=False)
-        embed.add_field(name="Unreal Engine Docuumentation", value="https://docs.unrealengine.com/en-US/index.html",
+        embed.add_field(name="Unreal Engine Docuumentation", value="[Unreal Docs](https://docs.unrealengine.com/en-US/index.html)",
                         inline=False)
-        embed.add_field(name="Unreal engine Reddit", value="https://www.reddit.com/r/unrealengine/", inline=False)
-        embed.add_field(name="Community wiki", value="https://www.ue4community.wiki/", inline=False)
-        embed.add_field(name="different tutorial", value="https://www.raywenderlich.com/unreal-engine", inline=False)
+        embed.add_field(name="Unreal engine Reddit", value="[R/unreal](https://www.reddit.com/r/unrealengine/)", inline=False)
+        embed.add_field(name="Community wiki", value="[Community wiki](https://www.ue4community.wiki/)", inline=False)
+        embed.add_field(name="different tutorial", value="[Raywenderlich](https://www.raywenderlich.com/unreal-engine)", inline=False)
         await ctx.send(channel, embed=embed)
 
     @commands.command(pass_context=True, name='Godot')
     async def Godot(self, ctx):
         channel = ctx.message.channel
         embed = discord.Embed(title="Godot", description="Dodot Resources", color=0x3590be)
-        embed.add_field(name="godot website", value="https://godotengine.org/", inline=False)
-        embed.add_field(name="Godot documentation", value="https://docs.godotengine.org/en/stable/index.html",
+        embed.add_field(name="godot website", value="[Godot website](https://godotengine.org/)", inline=False)
+        embed.add_field(name="Godot documentation", value="[documentation](https://docs.godotengine.org/en/stable/index.html)",
                         inline=False)
-        embed.add_field(name="Reddit Godot", value="https://www.reddit.com/r/godot/", inline=False)
+        embed.add_field(name="Reddit Godot", value="[R/godot](https://www.reddit.com/r/godot/)", inline=False)
         await ctx.send(channel, embed = embed)
 
     @commands.command(pass_context=True, name='Art')
@@ -85,51 +85,51 @@ class GameDevDictionary(commands.Cog):
         channel = ctx.message.channel
         embed = discord.Embed(title="Art", description="General game Art", color=0xff2828)
         embed.add_field(name="massive art resource page",
-                        value="https://www.notion.so/The-Empire-Command-3a3bf979f8df4ca2a49315bc0dc31f9f", inline=False)
-        embed.add_field(name="Artstation learning", value="https://www.artstation.com/learning", inline=False)
-        embed.add_field(name="Art news site", value="https://80.lv/", inline=False)
-        embed.add_field(name="game art forum", value="https://polycount.com/", inline=False)
-        embed.add_field(name="Blender resources mix", value="https://www.blendernation.com/", inline=False)
-        embed.add_field(name="flipped normals", value="https://flippednormals.com/", inline=False)
-        embed.add_field(name="collab drawing program", value="https://magmastudio.io/", inline=False)
+                        value="[Link Notion](https://www.notion.so/The-Empire-Command-3a3bf979f8df4ca2a49315bc0dc31f9f)", inline=False)
+        embed.add_field(name="Artstation learning", value="[ASL link](https://www.artstation.com/learning)", inline=False)
+        embed.add_field(name="Art news site", value="[80lv](https://80.lv/)", inline=False)
+        embed.add_field(name="game art forum", value="[polycount](https://polycount.com/)", inline=False)
+        embed.add_field(name="Blender resources mix", value="[blendernation](https://www.blendernation.com/)", inline=False)
+        embed.add_field(name="flipped normals tutorials", value="[flippednormals](https://flippednormals.com/)", inline=False)
+        embed.add_field(name="collab drawing program", value="[magmastudio](https://magmastudio.io/)", inline=False)
         await ctx.send(channel, embed = embed)
 
     @commands.command(pass_context=True, name='Programming')
     async def Programming(self, ctx):
         channel = ctx.message.channel
         embed = discord.Embed(title="Programming", description="General programming resources", color=0x9fd6d7)
-        embed.add_field(name="Programming patterns", value="shorturl.at/fgrMU", inline=False)
-        embed.add_field(name="Infallible Code ", value="shorturl.at/cgGLQ", inline=False)
+        embed.add_field(name="Programming patterns book", value="[Programmming patterns](https://shorturl.at/fgrMU)", inline=False)
+        embed.add_field(name="Infallible Code youtube ", value="[Infallible code](https://shorturl.at/cgGLQ)", inline=False)
         embed.add_field(name="General Resources",
-                        value="shorturl.at/M4679", inline=False)
+                        value="[Link](https://shorturl.at/M4679)", inline=False)
         embed.add_field(name="Lean C# by building a rpg",
-                        value="shorturl.at/qrwR2", inline=False)
+                        value="[link](https://shorturl.at/qrwR2)", inline=False)
         embed.add_field(name="c# book",
-                        value="shorturl.at/oqwM7",
+                        value="[Link](https://shorturl.at/oqwM7)",
                         inline=False)
         embed.add_field(name="Beginning C++ Through Game Programming by Michael Dawson",
-                        value="shorturl.at/xABNU", inline=False)
+                        value="[Link](https://shorturl.at/xABNU)", inline=False)
         await ctx.send(channel, embed = embed)
 
     @commands.command(pass_context=True, name='Audio')
     async def Audio(self, ctx):
         channel = ctx.message.channel
         embed = discord.Embed(title="Audio", description="Game Audio Resources", color=0xf03cd6)
-        embed.add_field(name="Reddit Game Audio wiki", value="https://www.reddit.com/r/GameAudio/wiki/", inline=False)
+        embed.add_field(name="Reddit Game Audio wiki", value="[R/gameAudio](https://www.reddit.com/r/GameAudio/wiki/)", inline=False)
         embed.add_field(name="gamasutra design game audio",
-                        value="https://www.gamasutra.com/blogs/PavelShylenok/20190506/342095/Designing_Sounds_for_a_Game.php",
+                        value="[gamasutra](https://www.gamasutra.com/blogs/PavelShylenok/20190506/342095/Designing_Sounds_for_a_Game.php)",
                         inline=False)
         embed.add_field(name="Game design learn audio design",
-                        value="https://www.gamedesigning.org/learn/video-game-sound/", inline=False)
+                        value="[Link](https://www.gamedesigning.org/learn/video-game-sound/)", inline=False)
         await ctx.send(channel, embed = embed)
 
     @commands.command(pass_context=True, name='Shaders')
     async def Shaders(self, ctx):
         channel = ctx.message.channel
         embed = discord.Embed(title="Shader", description="Shaders resources", color=0x69ed7a)
-        embed.add_field(name="book of shaders", value="http://thebookofshaders.com", inline=False)
-        embed.add_field(name="Shader resource archive", value="http://halisavakis.com/archive/", inline=False)
-        embed.add_field(name="shaderlab", value="http://www.shaderslab.com", inline=False)
+        embed.add_field(name="book of shaders website", value="[book of shaders](http://thebookofshaders.com)", inline=False)
+        embed.add_field(name="Shader resource archive", value="[archive](http://halisavakis.com/archive/)", inline=False)
+        embed.add_field(name="shaderlab website", value="[shaderlab](http://www.shaderslab.com)", inline=False)
         await ctx.send(channel, embed = embed)
 
 
