@@ -8,7 +8,7 @@ class GameDevDictionary(commands.Cog):
         self.bot = bot
 
         self.data = {}
-        with open('../tutorials.json') as f:
+        with open('./tutorials.json') as f:
             self.data = json.load(f)
 
     @commands.command(pass_context=True)
