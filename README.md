@@ -14,6 +14,7 @@ It is currently hosted on the Heroku cloud platform.
 
 ### Contributors
 * [Medallyon](https://github.medallyon.me/)
+* [codetechninja](https://github.com/codetechninja)
 
 ## Contributing
 If you are a member of the society and wish to add features, enhancements, or fix bugs, your contribution is welcome!
